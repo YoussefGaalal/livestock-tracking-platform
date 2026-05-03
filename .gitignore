@@ -1,0 +1,66 @@
+# ============================================================
+# Root .gitignore — animal-trading-v2 (The Oasis)
+# ============================================================
+
+# ----- Laravel / PHP ----------------------------------------
+backend/vendor/
+backend/node_modules/
+backend/.env
+backend/.env.local
+backend/.env.*.local
+backend/storage/logs/*.log
+backend/storage/framework/cache/
+backend/storage/framework/sessions/
+backend/storage/framework/views/
+backend/bootstrap/cache/*.php
+backend/public/hot
+backend/public/storage
+
+# Compiled React frontend output (built by Railway, not committed)
+backend/public/app/
+
+# ----- Flutter / Dart ---------------------------------------
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/build/
+mobile/.packages
+# pubspec.lock is intentionally committed for reproducible Flutter builds
+
+# ----- Node (root-level tooling) ----------------------------
+node_modules/
+
+# ----- Environment & Secrets --------------------------------
+.env
+.env.*
+!.env.production        # keep the production template (no real secrets)
+*.pem
+*.key
+*.p12
+*.pfx
+
+*-analysis-report.html
+*-analysis-report.json
+
+# ----- Local generation/helper scripts (not part of the project) -----------
+generate-report.js
+generate-report.bat
+package.json
+package-lock.json
+
+# ----- OS & Editor ------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ----- Misc -------------------------------------------------
+*.log
+*.cache
+dist/
+tmp/
+temp/

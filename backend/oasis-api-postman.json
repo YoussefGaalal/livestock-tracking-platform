@@ -1,0 +1,783 @@
+{
+  "info": {
+    "name": "The Oasis API",
+    "description": "Livestock tracking platform API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:7590/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userRole",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "pm.request.headers.add({key: 'X-User-Id', value: pm.variables.get('userId')});",
+          "pm.request.headers.add({key: 'X-User-Role', value: pm.variables.get('userRole')});"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/login",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@oasis.com\",\n    \"password\": \"password\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/register",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"phone\": \"+971501234567\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/dashboard"
+          }
+        },
+        {
+          "name": "Get Reports",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/reports"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Animals",
+      "item": [
+        {
+          "name": "List Animals",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/animals?per_page=15",
+              "query": [
+                {"key": "per_page", "value": "15"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Animal",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/animals/2"
+          }
+        },
+        {
+          "name": "Create Animal",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/animals",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {"key": "species", "value": "Camel"},
+                {"key": "breed", "value": "Wadhah"},
+                {"key": "gender", "value": "Male"},
+                {"key": "date_of_birth", "value": "2021-01-01"},
+                {"key": "name", "value": "Test Animal"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Animal",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/animals/2",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {"key": "name", "value": "Updated Name"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Animal",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/animals/2"
+          }
+        },
+        {
+          "name": "Get Location History",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/animals/2/location-history?hours=720",
+              "query": [
+                {"key": "hours", "value": "720"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Transfer Ownership",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/animals/2/transfer-ownership",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"owner_id\": 5\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Devices",
+      "item": [
+        {
+          "name": "List Devices",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/devices"
+          }
+        },
+        {
+          "name": "Get Device",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/devices/1"
+          }
+        },
+        {
+          "name": "Create Device",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/devices",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Test Device\",\n    \"type\": \"collar\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Device",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/devices/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Updated Device\",\n    \"update_interval\": 30,\n    \"advanced_tracking\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Device",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/devices/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users"
+          }
+        },
+        {
+          "name": "Get User",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users/1"
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"New User\",\n    \"email\": \"newuser@oasis.com\",\n    \"password\": \"password123\",\n    \"role\": \"Owner\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/users/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Updated Name\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/users/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Geofences",
+      "item": [
+        {
+          "name": "List Geofences",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/geofences"
+          }
+        },
+        {
+          "name": "Get Geofence",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/geofences/1"
+          }
+        },
+        {
+          "name": "Create Geofence",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/geofences",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Test Geofence\",\n    \"type\": \"polygon\",\n    \"coordinates\": [[24.45,54.37],[24.46,54.38],[24.47,54.37]],\n    \"alert_type\": \"both\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Geofence",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/geofences/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Updated Geofence\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Geofence",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/geofences/1"
+          }
+        },
+        {
+          "name": "Get Geofence Alerts",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/geofence-alerts"
+          }
+        },
+        {
+          "name": "Acknowledge Alert",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/geofence-alerts/1/acknowledge"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Animal Groups",
+      "item": [
+        {
+          "name": "List Groups",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/animal-groups"
+          }
+        },
+        {
+          "name": "Get Group",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/animal-groups/1"
+          }
+        },
+        {
+          "name": "Create Group",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/animal-groups",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Test Group\",\n    \"color\": \"#D4AF37\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Add Animals to Group",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/animal-groups/1/add-animals",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"animal_ids\": [2, 3]\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Location History",
+      "item": [
+        {
+          "name": "Record Location",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/location-history",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"device_id\": 1,\n    \"latitude\": 24.4539,\n    \"longitude\": 54.3773,\n    \"speed\": 5.5,\n    \"heading\": 180\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Medical Records",
+      "item": [
+        {
+          "name": "List Medical Records",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/medical-records"
+          }
+        },
+        {
+          "name": "Get Medical Record",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/medical-records/1"
+          }
+        },
+        {
+          "name": "Create Medical Record",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/medical-records",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"animal_id\": 2,\n    \"type\": \"checkup\",\n    \"diagnosis\": \"Healthy\",\n    \"treatment\": \"None\",\n    \"notes\": \"Regular checkup\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Medical Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/medical-records/stats"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vaccination Schedules",
+      "item": [
+        {
+          "name": "List Schedules",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/vaccination-schedules"
+          }
+        },
+        {
+          "name": "Create Schedule",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/vaccination-schedules",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"animal_id\": 2,\n    \"vaccine_name\": \"Foot and Mouth\",\n    \"scheduled_date\": \"2026-05-01\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Administer Vaccine",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/vaccination-schedules/1/administer",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"notes\": \"Vaccine administered successfully\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "List Tasks",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/tasks"
+          }
+        },
+        {
+          "name": "My Tasks",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/tasks/my"
+          }
+        },
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/tasks",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Test Task\",\n    \"description\": \"Task description\",\n    \"priority\": \"high\",\n    \"due_date\": \"2026-05-01\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Complete Task",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/tasks/1/complete",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"notes\": \"Task completed\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Task Logs",
+      "item": [
+        {
+          "name": "List Task Logs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/task-logs"
+          }
+        },
+        {
+          "name": "Archive",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/task-logs/archive"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Predefined Tasks",
+      "item": [
+        {
+          "name": "List Predefined Tasks",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/predefined-tasks"
+          }
+        },
+        {
+          "name": "Create Predefined Task",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/predefined-tasks",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Morning Check\",\n    \"description\": \"Check all animals\",\n    \"category\": \"health\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auctions",
+      "item": [
+        {
+          "name": "List Auctions",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/auctions"
+          }
+        },
+        {
+          "name": "My Auctions",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/auctions/my"
+          }
+        },
+        {
+          "name": "My Bids",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/auctions/my-bids"
+          }
+        },
+        {
+          "name": "Create Auction",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auctions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"animal_id\": 2,\n    \"starting_price\": 5000,\n    \"start_time\": \"2026-05-01T10:00:00\",\n    \"end_time\": \"2026-05-07T10:00:00\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Place Bid",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auctions/1/bid",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"amount\": 5500\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subscriptions",
+      "item": [
+        {
+          "name": "Get Tiers",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/subscription/tiers"
+          }
+        },
+        {
+          "name": "Current Subscription",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/subscription/current"
+          }
+        },
+        {
+          "name": "Subscribe",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/subscription/subscribe/basic",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"payment_method\": \"card\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Settings",
+      "item": [
+        {
+          "name": "Get General Settings",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/settings/general"
+          }
+        },
+        {
+          "name": "Save General Settings",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/admin/settings/general",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"platform_name\": \"The Oasis\",\n    \"platform_url\": \"http://localhost:5173\",\n    \"admin_email\": \"admin@oasis.com\",\n    \"timezone\": \"Asia/Dubai\",\n    \"date_format\": \"Y-m-d\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get SMTP Settings",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/settings/smtp"
+          }
+        },
+        {
+          "name": "Save SMTP Settings",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/admin/settings/smtp",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"host\": \"smtp.mailtrap.io\",\n    \"port\": 2525,\n    \"username\": \"\",\n    \"password\": \"\",\n    \"from_email\": \"noreply@oasis.com\",\n    \"from_name\": \"The Oasis\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Twilio Settings",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/settings/twilio"
+          }
+        },
+        {
+          "name": "Save Twilio Settings",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/admin/settings/twilio",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"account_sid\": \"\",\n    \"auth_token\": \"\",\n    \"phone_number\": \"\",\n    \"enabled\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "Get WhatsApp Settings",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/settings/whatsapp"
+          }
+        },
+        {
+          "name": "Save WhatsApp Settings",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/admin/settings/whatsapp",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"api_url\": \"\",\n    \"api_token\": \"\",\n    \"phone_number_id\": \"\",\n    \"enabled\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Stripe Settings",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/settings/stripe"
+          }
+        },
+        {
+          "name": "Save Stripe Settings",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/admin/settings/stripe",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"secret_key\": \"\",\n    \"publishable_key\": \"\",\n    \"webhook_secret\": \"\",\n    \"enabled\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Gemini Settings",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/settings/gemini"
+          }
+        },
+        {
+          "name": "Save Gemini Settings",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/admin/settings/gemini",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"api_key\": \"\",\n    \"model\": \"gemini-pro\",\n    \"enabled\": false\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Export (Admin)",
+      "item": [
+        {
+          "name": "Export Animals",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/export/animals"
+          }
+        },
+        {
+          "name": "Export Devices",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/export/devices"
+          }
+        },
+        {
+          "name": "Export Geofences",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/export/geofences"
+          }
+        },
+        {
+          "name": "Export Users",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/export/users"
+          }
+        },
+        {
+          "name": "Export Database",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/export/database"
+          }
+        }
+      ]
+    }
+  ]
+}
