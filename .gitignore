@@ -56,6 +56,14 @@ generate-report.bat
 package.json
 package-lock.json
 
+# ----- Root-level docs (internal only) ----------------------
+DEPLOYMENT_GUIDE.md
+Pre-Deployment-Security-Review.docx
+*.docx
+
+# ----- Stray root-level Laravel file ------------------------
+/artisan
+
 # ----- OS & Editor ------------------------------------------
 .DS_Store
 Thumbs.db
