@@ -41,6 +41,14 @@ node_modules/
 
 *-analysis-report.html
 *-analysis-report.json
+Backend_Deep_Analysis.html
+*.html
+
+
+# ----- Word temp files --------------------------------------
+~$*.docx
+~$*.xlsx
+~$*.pptx
 
 # ----- Local generation/helper scripts (not part of the project) -----------
 generate-report.js
