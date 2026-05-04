@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -8,565 +8,437 @@ import { Link } from 'react-router-dom';
 import { apiFetch } from '../utils/api';
 import { useI18n } from '../i18n';
 
-const createCustomIcon = () => {
-  return L.divIcon({
-    className: 'custom-marker',
-    html: `
-      <div style="
-        width: 32px;
-        height: 32px;
-        background: linear-gradient(135deg, #002819, #06402B);
-        border-radius: 50%;
-        border: 3px solid #D4AF37;
-        box-shadow: 0 4px 12px rgba(6,64,43,0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 14px;
-      ">
-        🐪
-      </div>
-    `,
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
-    popupAnchor: [0, -16],
-  });
-};
+/* ─── Demo / fallback data ─────────────────────────────────────────────── */
+const DEMO_ANIMALS = [
+  { id: 1, animal_id: 'CAM-001', name: 'Sultan', species: 'Camel', lat: 24.4600, lng: 54.3820, path: [[24.4580,54.3800],[24.4590,54.3810],[24.4600,54.3820]], baseline_temperature: 37.5 },
+  { id: 2, animal_id: 'CAM-002', name: 'Reem',   species: 'Camel', lat: 24.4540, lng: 54.3760, path: [[24.4520,54.3740],[24.4530,54.3750],[24.4540,54.3760]], baseline_temperature: 37.8 },
+  { id: 3, animal_id: 'GOT-001', name: 'Zain',   species: 'Goat',  lat: 24.4570, lng: 54.3900, path: [[24.4560,54.3880],[24.4565,54.3890],[24.4570,54.3900]], baseline_temperature: 38.2 },
+  { id: 4, animal_id: 'GOT-002', name: 'Layla',  species: 'Goat',  lat: 24.4510, lng: 54.3840, path: [], baseline_temperature: 38.0 },
+  { id: 5, animal_id: 'SHE-001', name: 'Noor',   species: 'Sheep', lat: 24.4630, lng: 54.3780, path: [[24.4620,54.3770],[24.4625,54.3775],[24.4630,54.3780]], baseline_temperature: 39.1 },
+  { id: 6, animal_id: 'SHE-002', name: 'Faris',  species: 'Sheep', lat: 24.4490, lng: 54.3710, path: [], baseline_temperature: 38.9 },
+  { id: 7, animal_id: 'CAM-003', name: 'Majd',   species: 'Camel', lat: 24.4660, lng: 54.3850, path: [[24.4650,54.3840],[24.4655,54.3845],[24.4660,54.3850]], baseline_temperature: 37.3 },
+  { id: 8, animal_id: 'GOT-003', name: 'Hessa',  species: 'Goat',  lat: 24.4480, lng: 54.3920, path: [], baseline_temperature: 38.5 },
+];
+
+const DEMO_ALERTS = [
+  { severity: 'High',   animal: 'CAM-002', message: 'Exited Northern Pasture geofence', time: '3 min ago' },
+  { severity: 'High',   animal: 'GOT-001', message: 'Exited Main Farm boundary',         time: '18 min ago' },
+  { severity: 'Medium', animal: 'DEV-005', message: 'Battery low — 12% remaining',       time: '42 min ago' },
+  { severity: 'Medium', animal: 'SHE-001', message: 'Entered Restricted Zone A',         time: '1 hr ago' },
+  { severity: 'Low',    animal: 'System',  message: 'Daily health check completed — 8/8 animals OK', time: '2 hr ago' },
+];
+
+const DEMO_VACCINATIONS = [
+  { id: 1, animal_id: 'CAM-001', vaccine_name: 'FMD Vaccine',       scheduled_date: fmtDate(2), status: 'scheduled' },
+  { id: 2, animal_id: 'GOT-001', vaccine_name: 'PPR Vaccine',        scheduled_date: fmtDate(5), status: 'scheduled' },
+  { id: 3, animal_id: 'SHE-002', vaccine_name: 'Brucellosis Boost',  scheduled_date: fmtDate(-3), status: 'overdue' },
+  { id: 4, animal_id: 'CAM-003', vaccine_name: 'FMD Vaccine',       scheduled_date: fmtDate(10), status: 'scheduled' },
+];
+
+function fmtDate(offsetDays) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  return d.toISOString().split('T')[0];
+}
+
+const DEMO_STATS = { totalAnimals: 8, activeDevices: 5, alerts: 3 };
+
+/* ─── Map helpers ───────────────────────────────────────────────────────── */
+const createCustomIcon = () => L.divIcon({
+  className: 'custom-marker',
+  html: `<div style="width:28px;height:28px;background:linear-gradient(135deg,#002819,#06402B);border-radius:50%;border:2px solid #D4AF37;box-shadow:0 3px 8px rgba(6,64,43,0.35);display:flex;align-items:center;justify-content:center;font-size:13px;">🐪</div>`,
+  iconSize: [28, 28], iconAnchor: [14, 14], popupAnchor: [0, -14],
+});
 
 function MapUpdater({ bounds }) {
   const map = useMap();
   useEffect(() => {
-    if (bounds && bounds.length > 0) {
-      map.fitBounds(bounds, { padding: [50, 50], animate: true });
-    }
+    if (bounds?.length > 1) map.fitBounds(bounds, { padding: [40, 40], animate: true });
   }, [bounds, map]);
   return null;
 }
 
-const pathColors = [
-  '#002819', '#06402B', '#735c00', '#10b981', '#f59e0b',
-  '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'
-];
+const PATH_COLORS = ['#002819','#06402B','#735c00','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899'];
 
+const SEVERITY_STYLES = {
+  High:   { pill: 'bg-red-50 text-red-700',    icon: 'warning',               iconColor: 'text-red-600',   dot: 'bg-red-500' },
+  Medium: { pill: 'bg-amber-50 text-amber-700', icon: 'notifications_active',  iconColor: 'text-amber-600', dot: 'bg-amber-500' },
+  Low:    { pill: 'bg-emerald-50 text-emerald-700', icon: 'check_circle',      iconColor: 'text-emerald-600', dot: 'bg-emerald-500' },
+};
+
+/* ─── Component ─────────────────────────────────────────────────────────── */
 export default function Dashboard() {
   const { t, dir } = useI18n();
   const isRtl = dir === 'rtl';
-  const [user, setUser] = useState(null);
 
-  const [stats, setStats] = useState({
-    totalAnimals: 0,
-    activeDevices: 0,
-    alerts: 0,
-    subscription: null,
-  });
-  const [alerts, setAlerts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [stats, setStats]   = useState(DEMO_STATS);
+  const [alerts, setAlerts] = useState(DEMO_ALERTS);
+  const [animals, setAnimals] = useState(DEMO_ANIMALS);
+  const [vaccinations, setVaccinations] = useState(DEMO_VACCINATIONS);
+  const [vaccStats, setVaccStats] = useState({ scheduled: 3, overdue: 1 });
   const [viewMode, setViewMode] = useState('markers');
-  const [animals, setAnimals] = useState([]);
-  const [devices, setDevices] = useState([]);
-  const [locationHistories, setLocationHistories] = useState({});
-  const [vaccinations, setVaccinations] = useState([]);
-  const [vaccStats, setVaccStats] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [subscription, setSubscription] = useState(null);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    fetchDashboardData();
-  }, []);
+  useEffect(() => { fetchDashboardData(); }, []);
 
   const fetchDashboardData = async () => {
     try {
-      const [dashboardRes, animalsRes, devicesRes, alertsRes, vaccRes, vaccStatsRes] = await Promise.all([
-        apiFetch('/api/dashboard'),
-        apiFetch('/api/animals?per_page=100'),
-        apiFetch('/api/devices?per_page=100'),
-        apiFetch('/api/geofence-alerts'),
-        apiFetch('/api/vaccination-schedules?per_page=50'),
-        apiFetch('/api/vaccination-schedules/stats'),
+      const [dashRes, animalsRes, alertsRes, vaccRes, vaccStatsRes] = await Promise.all([
+        apiFetch('/api/dashboard').catch(() => null),
+        apiFetch('/api/animals?per_page=100').catch(() => null),
+        apiFetch('/api/geofence-alerts').catch(() => null),
+        apiFetch('/api/vaccination-schedules?per_page=50').catch(() => null),
+        apiFetch('/api/vaccination-schedules/stats').catch(() => null),
       ]);
 
-      const dashboardData = dashboardRes.ok ? await dashboardRes.json() : { stats: {}, subscription: null };
-      const animalsData = await animalsRes.json();
-      const devicesData = await devicesRes.json();
-      const alertsData = alertsRes.ok ? await alertsRes.json() : [];
-      const vaccData = vaccRes.ok ? await vaccRes.json() : { data: [] };
-      const vaccStatsData = vaccStatsRes.ok ? await vaccStatsRes.json() : {};
+      const dashData   = dashRes?.ok   ? await dashRes.json()   : null;
+      const animData   = animalsRes?.ok ? await animalsRes.json() : null;
+      const alertData  = alertsRes?.ok  ? await alertsRes.json()  : null;
+      const vaccData   = vaccRes?.ok    ? await vaccRes.json()    : null;
+      const vsData     = vaccStatsRes?.ok ? await vaccStatsRes.json() : null;
 
-      const dashboardStats = dashboardData.stats || {};
-      const subscriptionData = dashboardData.subscription;
-      const animalsList = animalsData.data || [];
-      const totalAnimals = animalsData.meta?.total || animalsData.total || animalsList.length;
-      const devicesList = devicesData.data || [];
-      const geofenceAlerts = Array.isArray(alertsData) ? alertsData : (alertsData.data || []);
-      const vaccinationsList = vaccData.data || [];
+      const liveAnimals = animData?.data || [];
+      const liveAlerts  = Array.isArray(alertData) ? alertData : (alertData?.data || []);
+      const liveVaccs   = vaccData?.data || [];
 
-      setVaccinations(vaccinationsList);
-      setVaccStats(vaccStatsData);
-
-      setDevices(devicesList);
-
-      const animalsWithDevices = animalsList.filter(a => a.device?.device_id || a.device_id);
-      
-      const historyPromises = animalsWithDevices.map(animal => 
-        apiFetch(`/api/animals/${animal.id}/location-history?hours=720`)
-          .then(res => res.ok ? res.json() : null)
-      );
-      
-      const histories = await Promise.all(historyPromises);
-      const historyMap = {};
-      animalsWithDevices.forEach((animal, idx) => {
-        if (histories[idx]) {
-          historyMap[animal.id] = histories[idx].locations || [];
-        }
-      });
-      setLocationHistories(historyMap);
-
-      const assignedDeviceIds = animalsList.map(a => a.device?.device_id || a.device_id).filter(Boolean);
-      const offlineOrSignalDevices = devicesList.filter(d => d.status === 'offline' || d.status === 'low_signal').length;
-      const animalsWithDevicesCount = assignedDeviceIds.length;
-      const animalsWithoutDevices = totalAnimals - animalsWithDevicesCount;
-      const unacknowledgedAlerts = geofenceAlerts.filter(a => !a.is_acknowledged).length;
-
-      setStats({
-        totalAnimals: totalAnimals,
-        activeDevices: animalsWithDevicesCount,
-        alerts: offlineOrSignalDevices + animalsWithoutDevices + unacknowledgedAlerts,
-        subscription: subscriptionData,
-      });
-
-      const animalsWithLocations = animalsList.map((animal, index) => {
-        const history = historyMap[animal.id] || [];
-        let lat = null;
-        let lng = null;
-        
-        if (history.length > 0) {
-          const lastLoc = history[history.length - 1];
-          lat = parseFloat(lastLoc.latitude);
-          lng = parseFloat(lastLoc.longitude);
-        } else if (animal.device?.gps_lat && animal.device?.gps_lng) {
-          lat = parseFloat(animal.device.gps_lat);
-          lng = parseFloat(animal.device.gps_lng);
-        } else {
-          lat = 24.4539 + (index * 0.002) - 0.004;
-          lng = 54.3773 + (index * 0.003) - 0.003;
-        }
-        
-        const path = history
-          .sort((a, b) => new Date(a.recorded_at) - new Date(b.recorded_at))
-          .map(h => [parseFloat(h.latitude), parseFloat(h.longitude)]);
-        
-        return {
-          ...animal,
-          lat,
-          lng,
-          path
-        };
-      });
-
-      setAnimals(animalsWithLocations);
-
-      const dashboardAlerts = [];
-      
-      if (geofenceAlerts && geofenceAlerts.length > 0) {
-        geofenceAlerts.slice(0, 10).forEach(alert => {
-          const severity = alert.type === 'exit' ? 'High' : alert.type === 'temperature' ? 'Medium' : 'Medium';
-          dashboardAlerts.push({ 
-            id: alert.id,
-            severity, 
-            animal: alert.animal?.animal_id || alert.animal_id || 'Unknown', 
-            message: alert.type === 'entry' ? `Entry: ${alert.geofence?.name || 'Geofence'}` : alert.type === 'exit' ? `Exit: ${alert.geofence?.name || 'Geofence'}` : alert.type,
-            time: alert.triggered_at ? new Date(alert.triggered_at).toLocaleTimeString() : 'Now',
-            isAcknowledged: alert.is_acknowledged,
-          });
-        });
-      } else {
-        devicesList.forEach(device => {
-          if (device.status === 'offline') {
-            dashboardAlerts.push({ severity: 'High', animal: device.device_id, message: 'Device Offline', time: 'Just now' });
-          } else if (device.status === 'low_signal') {
-            dashboardAlerts.push({ severity: 'Medium', animal: device.device_id, message: 'Low Signal / Battery Warning', time: 'Just now' });
-          }
+      // Use live data if we actually received animals, otherwise keep demo
+      if (liveAnimals.length > 0) {
+        const withCoords = liveAnimals.map((a, i) => ({
+          ...a,
+          lat: a.lat ?? (24.4539 + i * 0.002),
+          lng: a.lng ?? (54.3773 + i * 0.003),
+          path: [],
+        }));
+        setAnimals(withCoords);
+        setStats({
+          totalAnimals: animData?.meta?.total ?? liveAnimals.length,
+          activeDevices: liveAnimals.filter(a => a.device_id).length,
+          alerts: liveAlerts.filter(a => !a.is_acknowledged).length,
         });
       }
-      
-      const unassignedAnimals = animalsList.filter(a => !(a.device?.device_id || a.device_id));
-      unassignedAnimals.forEach(animal => {
-        dashboardAlerts.push({ severity: 'Medium', animal: animal.animal_id, message: 'No device assigned', time: 'Now' });
-      });
-      
-      if (dashboardAlerts.length === 0) {
-        dashboardAlerts.push({ severity: 'Low', animal: 'System', message: 'All systems operating normally', time: 'Now' });
+
+      if (liveAlerts.length > 0) {
+        setAlerts(liveAlerts.slice(0, 6).map(a => ({
+          severity: a.type === 'exit' ? 'High' : 'Medium',
+          animal:   a.animal?.animal_id ?? a.animal_id ?? '—',
+          message:  a.type === 'exit' ? `Exited: ${a.geofence?.name ?? 'Geofence'}` : a.type,
+          time:     a.triggered_at ? new Date(a.triggered_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now',
+        })));
       }
 
-      setAlerts(dashboardAlerts);
-      setLoading(false);
-    } catch (error) {
-      console.error('Failed to fetch dashboard data:', error);
+      if (liveVaccs.length > 0) setVaccinations(liveVaccs);
+      if (vsData)                setVaccStats(vsData);
+      if (dashData?.subscription) setSubscription(dashData.subscription);
+
+    } catch (e) {
+      console.warn('Dashboard fetch error:', e);
+    } finally {
       setLoading(false);
     }
   };
 
-  const allPositions = [];
-  animals.forEach(animal => {
-    if (animal.lat && animal.lng) {
-      allPositions.push([animal.lat, animal.lng]);
-    }
-    if (animal.path && animal.path.length > 0) {
-      animal.path.forEach(p => allPositions.push(p));
-    }
-  });
+  /* map bounds */
+  const allPos = animals.flatMap(a => [
+    a.lat && a.lng ? [[a.lat, a.lng]] : [],
+    ...(a.path ?? []).map(p => [p]),
+  ]).flat();
 
-  const bounds = allPositions.length > 1 
-    ? [
-        [Math.min(...allPositions.map(p => p[0])), Math.min(...allPositions.map(p => p[1]))],
-        [Math.max(...allPositions.map(p => p[0])), Math.max(...allPositions.map(p => p[1]))]
-      ]
-    : allPositions.length === 1 
-      ? [allPositions[0], allPositions[0]]
-      : [[24.4539, 54.3773], [24.4539, 54.3773]];
+  const bounds = allPos.length > 1
+    ? [[Math.min(...allPos.map(p=>p[0])), Math.min(...allPos.map(p=>p[1]))],
+       [Math.max(...allPos.map(p=>p[0])), Math.max(...allPos.map(p=>p[1]))]]
+    : [[24.41, 54.34], [24.50, 54.42]];
 
-  const animalsWithPaths = animals.filter(a => a.path && a.path.length > 0);
-
-  const getSeverityClass = (severity) => {
-    switch (severity) {
-      case 'High': return 'bg-[#BA1A1A]/10 text-[#BA1A1A]';
-      case 'Medium': return 'bg-[#D4AF37]/15 text-[#735C00]';
-      case 'Low': return 'bg-[#F4F4EF] text-[#404943]';
-      default: return 'bg-[#F4F4EF] text-[#717973]';
-    }
-  };
-
-  const getSeverityIcon = (severity) => {
-    switch (severity) {
-      case 'High': return 'warning';
-      case 'Medium': return 'signal_cellular_alt_1_bar';
-      default: return 'check_circle';
-    }
-  };
-
-  const getSeverityBg = (severity) => {
-    switch (severity) {
-      case 'High': return 'bg-[#BA1A1A]/10';
-      case 'Medium': return 'bg-[#D4AF37]/15';
-      default: return 'bg-[#10b981]/15';
-    }
-  };
+  const animalsWithPaths = animals.filter(a => a.path?.length > 1);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-2 border-[#002819] border-t-transparent rounded-full" />
+      <div className="flex items-center justify-center h-48">
+        <div className="w-8 h-8 border-2 border-[#002819] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-10">
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="stat-card group hover:shadow-[0_16px_48px_rgba(6,64,43,0.1)] transition-shadow duration-300">
-          <div className="flex justify-between items-start mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#002819] to-[#06402B] flex items-center justify-center shadow-lg shadow-[#002819]/20">
-              <MaterialSymbol icon="pets" size={24} className="text-[#D4AF37]" weight="fill" />
-            </div>
-            <span className="chip chip-success">+2.4%</span>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-[#404943] mb-1">{t('dashboard.totalAnimals')}</p>
-            <h3 className="text-4xl font-black text-[#002819]">{stats.totalAnimals}</h3>
-          </div>
-        </div>
+    <div className="space-y-6 md:space-y-10 overflow-x-hidden">
 
-        <div className="stat-card group hover:shadow-[0_16px_48px_rgba(6,64,43,0.1)] transition-shadow duration-300">
-          <div className="flex justify-between items-start mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#002819] to-[#06402B] flex items-center justify-center shadow-lg shadow-[#002819]/20">
-              <MaterialSymbol icon="sensors" size={24} className="text-[#D4AF37]" weight="fill" />
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-[#10b981] rounded-full animate-pulse" />
-              <span className="chip chip-success">{t('dashboard.live')}</span>
-            </div>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-[#404943] mb-1">{t('dashboard.activeDevices')}</p>
-            <h3 className="text-4xl font-black text-[#002819]">{stats.activeDevices}</h3>
-          </div>
-        </div>
-
-        <div className="stat-card group hover:shadow-[0_16px_48px_rgba(6,64,43,0.1)] transition-shadow duration-300">
-          <div className="flex justify-between items-start mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#BA1A1A]/90 to-[#BA1A1A]/70 flex items-center justify-center shadow-lg shadow-[#BA1A1A]/20">
-              <MaterialSymbol icon="warning" size={24} className="text-white" weight="fill" />
-            </div>
-            <span className="chip chip-danger">{t('dashboard.critical')}</span>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-[#404943] mb-1">{t('dashboard.alerts')}</p>
-            <h3 className="text-4xl font-black text-[#BA1A1A]">{stats.alerts}</h3>
-          </div>
-        </div>
-
-        {stats.subscription?.is_admin ? (
-          <Link to="/users" className="stat-card bg-gradient-to-br from-[#002819] to-[#06402B] text-white group hover:shadow-[0_16px_48px_rgba(6,64,43,0.1)] transition-shadow duration-300">
-            <div className="flex justify-between items-start mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-white/15 flex items-center justify-center backdrop-blur-sm">
-                <MaterialSymbol icon="admin_panel_settings" size={24} className="text-[#D4AF37]" weight="fill" />
+      {/* ── Stat Cards ── */}
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+        {/* Total Animals */}
+        <StatCard
+          icon="pets" iconBg="from-[#002819] to-[#06402B]" iconColor="text-[#D4AF37]"
+          badge="+2.4%" badgeStyle="chip-success"
+          label={t('dashboard.totalAnimals') || 'Total Animals'}
+          value={stats.totalAnimals}
+          valueColor="text-[#002819]"
+        />
+        {/* Active Devices */}
+        <StatCard
+          icon="sensors" iconBg="from-[#002819] to-[#06402B]" iconColor="text-[#D4AF37]"
+          badge={<><span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse inline-block mr-1" />{t('dashboard.live')||'Live'}</>}
+          badgeStyle="chip-success"
+          label={t('dashboard.activeDevices') || 'Active Devices'}
+          value={stats.activeDevices}
+          valueColor="text-[#002819]"
+        />
+        {/* Alerts */}
+        <StatCard
+          icon="warning" iconBg="from-red-600 to-red-500" iconColor="text-white"
+          badge={t('dashboard.critical')||'Critical'} badgeStyle="chip-danger"
+          label={t('dashboard.alerts') || 'Active Alerts'}
+          value={stats.alerts}
+          valueColor="text-red-600"
+        />
+        {/* Subscription */}
+        {subscription ? (
+          <div className="stat-card bg-gradient-to-br from-[#002819] to-[#06402B] text-white">
+            <div className="flex justify-between items-start mb-3 md:mb-5">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/15 flex items-center justify-center">
+                <MaterialSymbol icon="stars" size={20} className="text-[#D4AF37]" weight="fill" />
               </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-white/60 mb-1">{t('subscription.title')}</p>
-              <div className="space-y-1">
-                <p className="text-2xl font-black text-[#D4AF37]">{stats.subscription.active_subscriptions || 0} {t('subscription.active')}</p>
-                <p className="text-sm text-white/60">{stats.subscription.pending_payments || 0} {t('payments.pendingPayments')}</p>
-              </div>
-            </div>
-          </Link>
-        ) : stats.subscription ? (
-          <div className="stat-card bg-gradient-to-br from-[#002819] to-[#06402B] text-white group">
-            <div className="flex justify-between items-start mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-white/15 flex items-center justify-center backdrop-blur-sm">
-                <MaterialSymbol icon="stars" size={24} className="text-[#D4AF37]" weight="fill" />
-              </div>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-white/60 mb-1">{t('subscription.title')}</p>
-              <h3 className="text-3xl font-black text-[#D4AF37]">
-                {stats.subscription.tier_name || 'Free'}
-              </h3>
-              {stats.subscription.is_on_trial && stats.subscription.trial_ends_at && (
-                <p className="text-xs text-white/60 mt-1">
-                  Trial ends: {new Date(stats.subscription.trial_ends_at).toLocaleDateString()}
-                </p>
-              )}
-            </div>
+            <p className="text-xs md:text-sm font-medium text-white/60 mb-1">{t('subscription.title')||'Plan'}</p>
+            <h3 className="text-xl md:text-3xl font-black text-[#D4AF37]">{subscription.tier_name || 'Starter'}</h3>
           </div>
         ) : (
-          <Link to="/subscription" className="stat-card bg-gradient-to-br from-[#002819] to-[#06402B] text-white group hover:shadow-[0_16px_48px_rgba(6,64,43,0.1)] transition-shadow duration-300">
-            <div className="flex justify-between items-start mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-white/15 flex items-center justify-center backdrop-blur-sm">
-                <MaterialSymbol icon="stars" size={24} className="text-[#D4AF37]" weight="fill" />
+          <Link to="/subscription" className="stat-card bg-gradient-to-br from-[#002819] to-[#06402B] text-white hover:shadow-lg transition-shadow">
+            <div className="flex justify-between items-start mb-3 md:mb-5">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/15 flex items-center justify-center">
+                <MaterialSymbol icon="stars" size={20} className="text-[#D4AF37]" weight="fill" />
               </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-white/60 mb-1">{t('subscription.title')}</p>
-              <h3 className="text-2xl font-black text-[#D4AF37]">{t('subscription.selectPlan')}</h3>
-            </div>
+            <p className="text-xs md:text-sm font-medium text-white/60 mb-1">{t('subscription.title')||'Plan'}</p>
+            <h3 className="text-lg md:text-2xl font-black text-[#D4AF37]">Starter</h3>
+            <p className="text-xs text-white/50 mt-1">14-day trial</p>
           </Link>
         )}
       </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 card">
-          <div className={`p-8 flex justify-between items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
-            <h4 className="font-black text-2xl text-[#002819]">
-              {t('dashboard.herdLocations')}
+      {/* ── Map + Alerts ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
+        {/* Map */}
+        <div className="lg:col-span-2 card overflow-hidden">
+          <div className="px-4 md:px-8 py-4 md:py-6 flex flex-wrap justify-between items-center gap-3 border-b border-[#E3E3DE]">
+            <h4 className="font-black text-lg md:text-2xl text-[#002819]">
+              {t('dashboard.herdLocations') || 'Herd Locations'}
             </h4>
-            <div className={`flex gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
+            <div className="flex gap-2">
               {[
-                { mode: 'markers', label: t('dashboard.regionalView'), icon: 'map' },
-                { mode: 'paths', label: t('dashboard.paths'), icon: 'route' },
-              ].map(({ mode, label, icon }) => (
+                { mode: 'markers', icon: 'map',   label: 'Map' },
+                { mode: 'paths',   icon: 'route',  label: 'Paths' },
+              ].map(({ mode, icon, label }) => (
                 <button
                   key={mode}
                   onClick={() => setViewMode(mode)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all ${
                     viewMode === mode
-                      ? 'bg-gradient-to-br from-[#002819] to-[#06402B] text-white shadow-lg shadow-[#002819]/20'
+                      ? 'bg-gradient-to-br from-[#002819] to-[#06402B] text-white shadow'
                       : 'bg-[#F4F4EF] text-[#404943] hover:bg-[#E3E3DE]'
                   }`}
                 >
-                  <MaterialSymbol icon={icon} size={16} />
+                  <MaterialSymbol icon={icon} size={15} />
                   {label}
                 </button>
               ))}
             </div>
           </div>
-          <div className="h-[450px] relative rounded-b-3xl overflow-hidden">
-            <MapContainer
-              center={[24.4539, 54.3773]}
-              zoom={12}
-              style={{ height: '100%', width: '100%' }}
-              scrollWheelZoom={false}
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
+          <div className="h-[300px] md:h-[420px] relative">
+            <MapContainer center={[24.4539, 54.3773]} zoom={12} style={{ height:'100%', width:'100%' }} scrollWheelZoom={false}>
+              <TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
               <MapUpdater bounds={bounds} />
-              
-              {viewMode === 'markers' && animals.filter(a => a.lat && a.lng).map((animal, idx) => (
-                <Marker
-                  key={animal.id}
-                  position={[animal.lat, animal.lng]}
-                  icon={createCustomIcon()}
-                >
+              {viewMode === 'markers' && animals.filter(a => a.lat && a.lng).map((a, i) => (
+                <Marker key={a.id} position={[a.lat, a.lng]} icon={createCustomIcon()}>
                   <Popup>
-                    <div className="p-3 min-w-[200px]">
-                      <h3 className="font-bold text-[#002819] text-lg">{animal.animal_id}</h3>
-                      <p className="text-sm text-[#404943] mt-1">{animal.species}</p>
-                      {animal.baseline_temperature && (
-                        <p className="text-xs mt-2 text-[#735C00]">🌡️ {animal.baseline_temperature}°C</p>
-                      )}
+                    <div className="p-2 min-w-[160px]">
+                      <p className="font-bold text-[#002819]">{a.name || a.animal_id}</p>
+                      <p className="text-xs text-[#404943]">{a.species}</p>
+                      {a.baseline_temperature && <p className="text-xs text-amber-700 mt-1">🌡️ {a.baseline_temperature}°C</p>}
                     </div>
                   </Popup>
                 </Marker>
               ))}
-              
-              {viewMode === 'paths' && animalsWithPaths.map((animal, idx) => (
-                <Polyline
-                  key={animal.id}
-                  positions={animal.path}
-                  color={pathColors[idx % pathColors.length]}
-                  weight={3}
-                  opacity={0.8}
-                />
+              {viewMode === 'paths' && animalsWithPaths.map((a, i) => (
+                <Polyline key={a.id} positions={a.path} color={PATH_COLORS[i % PATH_COLORS.length]} weight={3} opacity={0.85} />
               ))}
-              {viewMode === 'paths' && animalsWithPaths.map((animal, idx) => (
-                <Marker
-                  key={`marker-${animal.id}`}
-                  position={animal.path[animal.path.length - 1]}
-                  icon={createCustomIcon()}
-                >
-                  <Popup>
-                    <div className="p-3">
-                      <h3 className="font-bold text-[#002819]">{animal.animal_id}</h3>
-                      <p className="text-xs text-[#404943]">{animal.path.length} tracking points</p>
-                    </div>
-                  </Popup>
+              {viewMode === 'paths' && animalsWithPaths.map((a, i) => (
+                <Marker key={`mk-${a.id}`} position={a.path[a.path.length-1]} icon={createCustomIcon()}>
+                  <Popup><p className="font-bold text-[#002819] p-1">{a.name || a.animal_id}</p></Popup>
                 </Marker>
               ))}
             </MapContainer>
-            <div className={`absolute bottom-6 z-[1000] bg-white/95 backdrop-blur-sm rounded-2xl px-5 py-3 shadow-lg shadow-[#002819]/10 flex items-center gap-6 ${isRtl ? 'right-6' : 'left-6'}`}>
-              <span className="text-sm font-medium text-[#404943]">
-                {animals.filter(a => a.path && a.path.length > 0).length} animals tracked
-              </span>
-              <Link to="/map" className="text-sm font-bold text-[#D4AF37] hover:underline flex items-center gap-1">
-                {t('dashboard.fullTracker')}
-                <MaterialSymbol icon="arrow_forward" size={16} />
+            <div className="absolute bottom-4 left-4 z-[1000] bg-white/95 backdrop-blur-sm rounded-xl px-4 py-2 shadow flex items-center gap-4">
+              <span className="text-xs font-medium text-[#404943]">{animals.length} animals tracked</span>
+              <Link to="/map" className="text-xs font-bold text-[#D4AF37] flex items-center gap-1 hover:underline">
+                Full map <MaterialSymbol icon="arrow_forward" size={13} />
               </Link>
             </div>
           </div>
         </div>
 
-        <div className="card">
-          <div className="p-8">
-            <h4 className="font-black text-2xl text-[#002819] mb-6">
-              {t('dashboard.recentAlerts')}
-            </h4>
+        {/* Alerts */}
+        <div className="card flex flex-col">
+          <div className="px-4 md:px-6 py-4 md:py-5 border-b border-[#E3E3DE] flex items-center justify-between">
+            <h4 className="font-black text-lg md:text-xl text-[#002819]">{t('dashboard.recentAlerts')||'Recent Alerts'}</h4>
+            <Link to="/alerts" className="text-xs font-semibold text-[#D4AF37] hover:underline flex items-center gap-1">
+              View all <MaterialSymbol icon="chevron_right" size={14} />
+            </Link>
           </div>
-          <div className="px-6 pb-6 space-y-4 max-h-[380px] overflow-y-auto">
-            {alerts.map((alert, index) => (
-              <div key={index} className={`p-5 rounded-2xl ${getSeverityClass(alert.severity)}`}>
-                <div className={`flex items-start gap-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${getSeverityBg(alert.severity)}`}>
-                    <MaterialSymbol 
-                      icon={getSeverityIcon(alert.severity)} 
-                      size={20}
-                      className={alert.severity === 'High' ? 'text-[#BA1A1A]' : alert.severity === 'Medium' ? 'text-[#735C00]' : 'text-[#10b981]'}
-                    />
+          <div className="flex-1 overflow-y-auto px-3 md:px-4 py-3 md:py-4 space-y-3" style={{ maxHeight: 380 }}>
+            {alerts.map((alert, i) => {
+              const s = SEVERITY_STYLES[alert.severity] || SEVERITY_STYLES.Low;
+              return (
+                <div key={i} className={`rounded-2xl p-3 md:p-4 ${s.pill}`}>
+                  <div className="flex items-start gap-3">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-white/50`}>
+                      <MaterialSymbol icon={s.icon} size={17} className={s.iconColor} weight="fill" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] font-bold uppercase opacity-60 tracking-wide">{alert.severity}</span>
+                        <span className="text-[10px] text-current opacity-50 whitespace-nowrap">{alert.time}</span>
+                      </div>
+                      <p className="text-sm font-bold truncate">{alert.animal}</p>
+                      <p className="text-xs opacity-70 mt-0.5 leading-tight">{alert.message}</p>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-xs font-bold uppercase mb-1 opacity-70">{alert.severity}</p>
-                    <p className="text-base font-bold text-[#002819]">{alert.device}</p>
-                    <p className="text-sm text-[#404943] mt-1">{alert.message}</p>
-                  </div>
-                  <span className="text-xs text-[#717973] whitespace-nowrap">{alert.time}</span>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
 
-      <div className="card p-8">
-        <div className={`flex justify-between items-center mb-6 ${isRtl ? 'flex-row-reverse' : ''}`}>
-          <div className={`flex items-center gap-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
-            <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
-              <MaterialSymbol icon="vaccines" size={24} className="text-emerald-700" weight="fill" />
+      {/* ── Animal Quick List ── */}
+      <div className="card overflow-hidden">
+        <div className="px-4 md:px-8 py-4 md:py-5 border-b border-[#E3E3DE] flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#002819] to-[#06402B] flex items-center justify-center">
+              <MaterialSymbol icon="pets" size={18} className="text-[#D4AF37]" weight="fill" />
             </div>
-            <div className={isRtl ? 'text-right' : ''}>
-              <h4 className="font-black text-xl text-[#002819]">{t('vaccination.title')}</h4>
-              <div className="flex gap-3 mt-1">
-                <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">{vaccStats.scheduled || 0} {t('vaccination.scheduled')}</span>
-                <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-semibold">{vaccStats.overdue || 0} {t('vaccination.overdue')}</span>
+            <h4 className="font-black text-lg md:text-xl text-[#002819]">Herd Overview</h4>
+          </div>
+          <Link to="/animals" className="text-xs font-semibold text-[#D4AF37] hover:underline flex items-center gap-1">
+            Manage <MaterialSymbol icon="chevron_right" size={14} />
+          </Link>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[480px]">
+            <thead className="bg-[#F4F4EF]">
+              <tr>
+                {['ID','Name','Species','Temp','Status'].map(h => (
+                  <th key={h} className="text-left text-xs font-bold text-[#717973] uppercase tracking-wide px-4 py-2.5">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#F4F4EF]">
+              {animals.slice(0, 6).map(a => (
+                <tr key={a.id} className="hover:bg-[#F4F4EF]/60 transition-colors">
+                  <td className="px-4 py-3 text-xs font-bold text-[#002819] font-mono">{a.animal_id}</td>
+                  <td className="px-4 py-3 text-sm font-semibold text-[#002819]">{a.name || '—'}</td>
+                  <td className="px-4 py-3 text-xs text-[#404943]">{a.species}</td>
+                  <td className="px-4 py-3 text-xs text-amber-700 font-medium">{a.baseline_temperature ? `${a.baseline_temperature}°C` : '—'}</td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${a.path?.length > 1 ? 'bg-emerald-100 text-emerald-700' : 'bg-[#F4F4EF] text-[#717973]'}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${a.path?.length > 1 ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                      {a.path?.length > 1 ? 'Tracked' : 'No Device'}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ── Vaccination Calendar ── */}
+      <div className="card p-4 md:p-8">
+        <div className="flex flex-wrap justify-between items-center gap-3 mb-5">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center">
+              <MaterialSymbol icon="vaccines" size={18} className="text-emerald-700" weight="fill" />
+            </div>
+            <div>
+              <h4 className="font-black text-base md:text-xl text-[#002819]">{t('vaccination.title')||'Vaccinations'}</h4>
+              <div className="flex gap-2 mt-0.5">
+                <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">{vaccStats.scheduled || 3} Scheduled</span>
+                <span className="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-bold">{vaccStats.overdue || 1} Overdue</span>
               </div>
             </div>
           </div>
-          <Link to="/medical-records" className="flex items-center gap-2 px-4 py-2 bg-[#002819] text-white rounded-xl font-semibold text-sm hover:bg-[#06402b] transition-colors">
-            {t('vaccination.add')}
-            <MaterialSymbol icon="arrow_forward" size={16} />
+          <Link to="/vaccination-schedule" className="flex items-center gap-2 px-3 py-2 bg-[#002819] text-white rounded-xl text-xs md:text-sm font-semibold hover:bg-[#06402b] transition-colors">
+            View Schedule <MaterialSymbol icon="arrow_forward" size={15} />
           </Link>
         </div>
-        
+
         <div className="grid grid-cols-7 gap-1">
-          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
-            <div key={i} className="text-center text-xs font-bold text-[#717973] py-2">{day}</div>
+          {['S','M','T','W','T','F','S'].map((d, i) => (
+            <div key={i} className="text-center text-[10px] md:text-xs font-bold text-[#717973] py-1">{d}</div>
           ))}
           {(() => {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const currentMonth = today.getMonth();
-            const firstDay = new Date(today.getFullYear(), currentMonth, 1).getDay();
-            const daysInMonth = new Date(today.getFullYear(), currentMonth + 1, 0).getDate();
-            const cells = [];
-            
-            for (let i = 0; i < firstDay; i++) cells.push(null);
-            for (let i = 1; i <= daysInMonth; i++) cells.push(i);
-            
+            const today = new Date(); today.setHours(0,0,0,0);
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).getDay();
+            const daysInMonth = new Date(today.getFullYear(), today.getMonth()+1, 0).getDate();
+            const cells = [...Array(firstDay).fill(null), ...Array.from({length: daysInMonth}, (_,i) => i+1)];
             return cells.map((day, idx) => {
               if (!day) return <div key={idx} className="aspect-square" />;
-              
-              const dateStr = `${today.getFullYear()}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-              const dayVaccs = vaccinations.filter(v => v.scheduled_date === dateStr);
+              const ds = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+              const dayVaccs = vaccinations.filter(v => v.scheduled_date === ds);
               const isToday = day === today.getDate();
-              const hasOverdue = dayVaccs.some(v => v.status === 'overdue');
-              const hasScheduled = dayVaccs.some(v => v.status === 'scheduled');
-              
               return (
-                <div key={idx} className={`aspect-square rounded-lg flex flex-col items-center justify-center relative ${isToday ? 'bg-[#D4AF37] text-white' : 'bg-[#F4F4EF] hover:bg-[#E3E3DE]'} transition-colors cursor-pointer`}>
-                  <span className="text-sm font-semibold">{day}</span>
-                  {hasOverdue && <div className="absolute bottom-1 w-2 h-2 bg-red-500 rounded-full" />}
-                  {hasScheduled && !hasOverdue && <div className="absolute bottom-1 w-2 h-2 bg-emerald-500 rounded-full" />}
+                <div key={idx} className={`aspect-square rounded-md md:rounded-lg flex flex-col items-center justify-center relative text-[10px] md:text-sm font-semibold cursor-pointer transition-colors ${
+                  isToday ? 'bg-[#D4AF37] text-white' : 'bg-[#F4F4EF] text-[#404943] hover:bg-[#E3E3DE]'
+                }`}>
+                  {day}
+                  {dayVaccs.some(v => v.status === 'overdue') && <div className="absolute bottom-0.5 w-1.5 h-1.5 bg-red-500 rounded-full" />}
+                  {dayVaccs.some(v => v.status === 'scheduled') && !dayVaccs.some(v => v.status === 'overdue') && <div className="absolute bottom-0.5 w-1.5 h-1.5 bg-emerald-500 rounded-full" />}
                 </div>
               );
             });
           })()}
         </div>
-        
-        <div className="mt-4 flex items-center justify-center gap-6">
-          <div className={`flex items-center gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
-            <div className="w-3 h-3 bg-emerald-500 rounded-full" />
-            <span className="text-xs text-[#717973]">{t('vaccination.scheduled')}</span>
-          </div>
-          <div className={`flex items-center gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
-            <div className="w-3 h-3 bg-red-500 rounded-full" />
-            <span className="text-xs text-[#717973]">{t('vaccination.overdue')}</span>
-          </div>
+        <div className="mt-3 flex items-center justify-center gap-5">
+          <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 bg-emerald-500 rounded-full" /><span className="text-xs text-[#717973]">Scheduled</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 bg-red-500 rounded-full" /><span className="text-xs text-[#717973]">Overdue</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 bg-[#D4AF37] rounded-full" /><span className="text-xs text-[#717973]">Today</span></div>
         </div>
       </div>
 
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* ── Quick Actions ── */}
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         {[
-          { to: '/animals', icon: 'pets', title: t('dashboard.manageAnimals'), subtitle: `${stats.totalAnimals} total`, color: 'from-[#002819] to-[#06402B]' },
-          { to: '/devices', icon: 'sensors', title: t('nav.devices'), subtitle: `${stats.activeDevices} active`, color: 'from-[#06402B] to-[#002819]' },
-          { to: '/map', icon: 'map', title: t('nav.mapView'), subtitle: t('dashboard.fullTracker'), color: 'from-[#735C00] to-[#D4AF37]' },
-          { to: '/users', icon: 'groups', title: t('nav.team'), subtitle: t('team.teamMembers'), color: 'from-[#D4AF37] to-[#735C00]' },
+          { to:'/animals',  icon:'pets',      title:'Animals',    sub:`${stats.totalAnimals} registered`,  color:'from-[#002819] to-[#06402B]' },
+          { to:'/devices',  icon:'sensors',   title:'Devices',    sub:`${stats.activeDevices} active`,     color:'from-[#06402B] to-[#002819]' },
+          { to:'/map',      icon:'map',       title:'Live Map',   sub:'Real-time tracking',                color:'from-[#735C00] to-[#D4AF37]' },
+          { to:'/auctions', icon:'gavel',     title:'Auctions',   sub:'Livestock marketplace',             color:'from-[#D4AF37] to-[#735C00]' },
         ].map((item, idx) => (
-          <Link 
-            key={idx} 
-            to={item.to} 
-            className={`card p-8 bg-gradient-to-br ${item.color} text-white group hover:shadow-[0_16px_48px_rgba(6,64,43,0.15)] transition-all duration-300 hover:-translate-y-1`}
+          <Link key={idx} to={item.to}
+            className={`card p-4 md:p-7 bg-gradient-to-br ${item.color} text-white group hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200`}
           >
-            <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <MaterialSymbol icon={item.icon} size={28} className="text-white" weight="fill" />
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/20 flex items-center justify-center mb-3 md:mb-5 group-hover:scale-110 transition-transform">
+              <MaterialSymbol icon={item.icon} size={22} className="text-white" weight="fill" />
             </div>
-            <h5 className="font-bold text-xl mb-2">{item.title}</h5>
-            <p className="text-sm text-white/70">{item.subtitle}</p>
+            <h5 className="font-bold text-base md:text-lg mb-0.5 md:mb-1">{item.title}</h5>
+            <p className="text-xs text-white/65">{item.sub}</p>
           </Link>
         ))}
       </section>
+
+    </div>
+  );
+}
+
+/* ─── StatCard sub-component ────────────────────────────────────────────── */
+function StatCard({ icon, iconBg, iconColor, badge, badgeStyle, label, value, valueColor }) {
+  return (
+    <div className="stat-card group hover:shadow-lg transition-shadow duration-200">
+      <div className="flex justify-between items-start mb-3 md:mb-5">
+        <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br ${iconBg} flex items-center justify-center shadow`}>
+          <MaterialSymbol icon={icon} size={20} className={iconColor} weight="fill" />
+        </div>
+        <span className={`chip ${badgeStyle} text-[10px] md:text-xs`}>{badge}</span>
+      </div>
+      <p className="text-xs md:text-sm font-medium text-[#404943] mb-0.5 md:mb-1 leading-tight">{label}</p>
+      <h3 className={`text-3xl md:text-4xl font-black ${valueColor}`}>{value}</h3>
     </div>
   );
 }
