@@ -72,8 +72,9 @@ export default function Login() {
   };
 
   return (
-    <div className={`min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-[#FAF1F5] via-[#F4F4EF] to-[#E3E3DE] ${isRtl ? 'rtl' : 'ltr'}`}>
-      <div className="absolute inset-0 z-0">
+    <div className={`min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-[#FAF1F5] via-[#F4F4EF] to-[#E3E3DE] ${isRtl ? 'rtl' : 'ltr'}`}>
+       <div className="flex-1 flex items-center justify-center relative">
+       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-[#eeeee9]/30" />
         <div
           className="w-full h-full"
@@ -284,15 +285,16 @@ export default function Login() {
             </button>
           </div>
         </div>
-      </div>
-
-      <footer className={`absolute bottom-0 w-full py-8 px-12 z-20 ${isRtl ? 'flex-row-reverse' : ''}`}>
-        <div className={`flex justify-between items-center max-w-screen-2xl mx-auto ${isRtl ? 'flex-row-reverse' : ''}`}>
-            <p className="text-white/80 font-medium text-sm">
-            © 2024 {platformName}. Digital Majlis.
-          </p>
         </div>
-      </footer>
+       </div>
+
+       <footer className={`py-6 px-12 z-20 bg-[#06402B] ${isRtl ? 'flex-row-reverse' : ''}`}>
+         <div className={`flex justify-center items-center max-w-screen-2xl mx-auto ${isRtl ? 'flex-row-reverse' : ''}`}>
+             <p className="text-white/80 font-medium text-sm">
+             © 2024 {platformName}. Digital Majlis.
+           </p>
+         </div>
+       </footer>
     </div>
   );
 }
