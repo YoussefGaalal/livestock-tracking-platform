@@ -10,6 +10,16 @@ export default function UserCreate() {
   const { user } = useAuth();
   const { t } = useI18n();
   const isAdmin = user?.role === 'Admin';
+  const canCreateUsers = user?.role === 'Admin' || user?.role === 'Owner';
+  
+  if (!canCreateUsers) {
+    return (
+      <div className="p-8 text-center">
+        <h2 className="text-xl font-bold text-gray-900">Access Restricted</h2>
+        <p className="text-gray-500 mt-2">You do not have permission to create users.</p>
+      </div>
+    );
+  }
   
   const [form, setForm] = useState({
     name: '',
@@ -116,8 +126,9 @@ export default function UserCreate() {
                 className="w-full appearance-none bg-[#e8e8e3] border-none rounded-xl p-4 focus:ring-2 focus:ring-[#06402B]/20 transition outline-none pr-10"
               >
                 {isAdmin && <option value="Admin">{t('users.admin')}</option>}
-                <option value="Owner">{t('users.owner')}</option>
-                <option value="Manager">{t('users.manager')}</option>
+                {isAdmin && <option value="Owner">{t('users.owner')}</option>}
+                {isAdmin && <option value="Manager">{t('users.manager')}</option>}
+                <option value="Doctor">{t('users.doctor')}</option>
                 <option value="Shepherd">{t('users.shepherd')}</option>
               </select>
               <MaterialSymbol icon="expand_more" className="absolute right-4 top-1/2 -translate-y-1/2 text-[#002819]/40 pointer-events-none" />

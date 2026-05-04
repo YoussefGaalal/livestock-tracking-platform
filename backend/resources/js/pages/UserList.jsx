@@ -10,6 +10,7 @@ import Pagination from '../components/Pagination';
 export default function UserList() {
   const { t, dir } = useI18n();
   const { user } = useAuth();
+  const currentUserId = user?.id;
   const isRtl = dir === 'rtl';
 
   const [users, setUsers] = useState([]);
@@ -24,7 +25,8 @@ export default function UserList() {
   const [totalUsers, setTotalUsers] = useState(0);
   
   const isAdmin = user?.role === 'Admin';
-
+  const canCreateUsers = user?.role === 'Admin' || user?.role === 'Owner';
+  
   useEffect(() => {
     fetchData();
   }, [currentPage, perPage]);
@@ -125,10 +127,12 @@ export default function UserList() {
               {exporting ? t('common.exporting') : t('common.export')}
             </button>
           )}
-          <Link to="/users/add" className="btn-primary flex items-center gap-2 w-fit">
-            <MaterialSymbol icon="person_add" size={18} />
-            {t('users.addUser')}
-          </Link>
+          {canCreateUsers && (
+            <Link to="/users/add" className="btn-primary flex items-center gap-2 w-fit">
+              <MaterialSymbol icon="person_add" size={18} />
+              {t('users.addUser')}
+            </Link>
+          )}
         </div>
       </div>
 
@@ -207,12 +211,16 @@ export default function UserList() {
                   </td>
                   <td className={`px-6 py-5 ${isRtl ? 'text-left' : 'text-right'}`}>
                     <div className={`flex items-center gap-1 ${isRtl ? 'justify-start' : 'justify-end'}`}>
-                      <Link to={`/users/${user.id}/edit`} className="p-3 text-[#717973] hover:text-[#002819] hover:bg-[#F4F4EF] rounded-xl transition-all">
-                        <MaterialSymbol icon="edit" size={20} />
-                      </Link>
-                      <button onClick={() => handleDelete(user.id)} className="p-3 text-[#717973] hover:text-[#BA1A1A] hover:bg-[#ffdad6]/50 rounded-xl transition-all">
-                        <MaterialSymbol icon="delete" size={20} />
-                      </button>
+                      {(isAdmin || user?.id === currentUserId || (user?.role === 'Owner' && (user?.managed_by === user?.id || user?.id === currentUserId))) && (
+                        <Link to={`/users/${user.id}/edit`} className="p-3 text-[#717973] hover:text-[#002819] hover:bg-[#F4F4EF] rounded-xl transition-all">
+                          <MaterialSymbol icon="edit" size={20} />
+                        </Link>
+                      )}
+                      {isAdmin && (
+                        <button onClick={() => handleDelete(user.id)} className="p-3 text-[#717973] hover:text-[#BA1A1A] hover:bg-[#ffdad6]/50 rounded-xl transition-all">
+                          <MaterialSymbol icon="delete" size={20} />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

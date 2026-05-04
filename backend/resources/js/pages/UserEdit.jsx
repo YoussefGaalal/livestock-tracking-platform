@@ -7,8 +7,17 @@ import { useI18n } from '../i18n';
 export default function UserEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user: currentUser } = useAuth();
   const { t, dir } = useI18n();
   const isRtl = dir === 'rtl';
+
+  const canEdit = currentUser?.role === 'Admin' ||
+    currentUser?.id === parseInt(id) ||
+    (currentUser?.role === 'Owner' && form.managed_by === currentUser?.id);
+
+  if (!canEdit && form.role) {
+    navigate('/users');
+  }
   
   const [form, setForm] = useState({
     name: '',
@@ -181,19 +190,22 @@ export default function UserEdit() {
 
               <div>
                 <label className={`block text-xs font-bold text-[#404943] uppercase tracking-wider mb-2 ${isRtl ? 'text-right' : ''}`}>{t('users.role')}</label>
-                <div className="relative">
-                  <select
-                    value={form.role}
-                    onChange={e => set('role', e.target.value)}
-                    className="input-field appearance-none pr-12"
-                  >
-                    <option value="Shepherd">{t('users.shepherd')}</option>
-                    <option value="Manager">{t('users.manager')}</option>
-                    <option value="Owner">{t('users.owner')}</option>
-                    <option value="Admin">{t('users.admin')}</option>
-                  </select>
-                  <MaterialSymbol icon="expand_more" className={`absolute top-1/2 -translate-y-1/2 text-[#002819]/40 pointer-events-none ${isRtl ? 'left-4 right-auto' : 'right-4'}`} />
-                </div>
+                  {currentUser?.role === 'Admin' && (
+                    <div className="relative">
+                      <select
+                        value={form.role}
+                        onChange={e => set('role', e.target.value)}
+                        className="input-field appearance-none pr-12"
+                      >
+                        <option value="Shepherd">{t('users.shepherd')}</option>
+                        <option value="Doctor">{t('users.doctor')}</option>
+                        <option value="Manager">{t('users.manager')}</option>
+                        <option value="Owner">{t('users.owner')}</option>
+                        <option value="Admin">{t('users.admin')}</option>
+                      </select>
+                      <MaterialSymbol icon="expand_more" className={`absolute top-1/2 -translate-y-1/2 text-[#002819]/40 pointer-events-none ${isRtl ? 'left-4 right-auto' : 'right-4'}`} />
+                    </div>
+                  )}
               </div>
             </div>
           </section>

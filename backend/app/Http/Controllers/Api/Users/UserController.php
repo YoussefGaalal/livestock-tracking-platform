@@ -238,7 +238,20 @@ private function filterByRole(Request $request, $query)
         
         $role = $this->getAuthRole($request);
         
-        if ($role !== 'Admin') {
+        if ($role === 'Admin') {
+            // Admin can change anything
+        } elseif ($role === 'Owner') {
+            // Owner can assign Doctor/Shepherd roles to managed users
+            if (isset($validated['role']) && $validated['role']) {
+                if (!in_array($validated['role'], ['Doctor', 'Shepherd'])) {
+                    return response()->json(['message' => 'Owner can only assign Doctor or Shepherd roles'], 403);
+                }
+                $user->syncRoles([$validated['role']]);
+                unset($validated['role']);
+            }
+            unset($validated['subscription_tier_id']);
+            unset($validated['managed_by']);
+        } else {
             unset($validated['role']);
             unset($validated['subscription_tier_id']);
             unset($validated['managed_by']);

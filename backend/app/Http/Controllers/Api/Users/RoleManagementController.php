@@ -15,6 +15,11 @@ class RoleManagementController extends Controller
 
     public function index(): JsonResponse
     {
+        $authUser = request()->user();
+        if (!$authUser || !$authUser->hasRole('Admin')) {
+            return response()->json(['message' => 'Unauthorized. Admin role required.', 'error' => 'unauthorized'], 403);
+        }
+
         $roles = Role::with('permissions')->get()->map(function ($role) {
             $userCount = User::role($role->name)->count();
             return [
@@ -188,6 +193,11 @@ class RoleManagementController extends Controller
 
     public function getUserRoles(User $user): JsonResponse
     {
+        $authUser = request()->user();
+        if (!$authUser || !$authUser->hasRole('Admin')) {
+            return response()->json(['message' => 'Unauthorized. Admin role required.', 'error' => 'unauthorized'], 403);
+        }
+
         return response()->json([
             'user' => [
                 'id' => $user->id,

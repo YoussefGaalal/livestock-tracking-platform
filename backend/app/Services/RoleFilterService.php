@@ -20,7 +20,7 @@ class RoleFilterService
      */
     public static function filter(User $user, string $entity): Builder
     {
-        $role = $user->role;
+        $role = $user->getPrimaryRoleName();
         $userId = $user->id;
         
         // Admin sees all
@@ -82,7 +82,7 @@ class RoleFilterService
      */
     public static function canAccess(User $user, string $permission): bool
     {
-        $role = $user->role;
+        $role = $user->getPrimaryRoleName();
         
         // Permission map: role => allowed permissions
         $permissions = [
@@ -103,7 +103,7 @@ class RoleFilterService
      */
     public static function getAccessibleRoutes(User $user): array
     {
-        $role = $user->role;
+        $role = $user->getPrimaryRoleName();
         
         $routes = [
             'Admin' => ['/dashboard', '/animals', '/devices', '/geofences', '/tasks', '/medical-records', '/users', '/settings', '/reports', '/subscription', '/roles'],

@@ -27,13 +27,14 @@ export default function TeamPage() {
   });
 
   const isAdmin = user?.role === 'Admin';
-
-  if (!isAdmin) {
+  const canManageTeam = user?.role === 'Admin' || user?.role === 'Owner';
+  
+  if (!canManageTeam) {
     return (
       <div className="p-8 text-center">
         <MaterialSymbol icon="lock" size={48} className="text-gray-400 mx-auto mb-4" />
         <h2 className="text-xl font-bold text-gray-900">Access Restricted</h2>
-        <p className="text-gray-500 mt-2">This page is only accessible to administrators.</p>
+        <p className="text-gray-500 mt-2">This page is only accessible to administrators and owners.</p>
       </div>
     );
   }
