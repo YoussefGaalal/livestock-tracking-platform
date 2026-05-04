@@ -13,7 +13,7 @@ return new class extends Migration
         DB::statement("ALTER TABLE animals MODIFY COLUMN species ENUM('Camel','Goat','Sheep','Horse','Cattle','Donkey') NOT NULL");
 
         // Normalise gender to lowercase to match seeder values
-        DB::statement("ALTER TABLE animals MODIFY COLUMN gender ENUM('male','female','Male','Female') NOT NULL");
+        DB::statement("ALTER TABLE animals MODIFY COLUMN gender ENUM('male','female') NOT NULL");
     }
 
     public function down(): void

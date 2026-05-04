@@ -519,11 +519,18 @@ export default {
     register: 'التسجيل',
     email: 'البريد الإلكتروني',
     password: 'كلمة المرور',
+    newPassword: 'كلمة المرور الجديدة',
+    resetPassword: 'إعادة تعيين كلمة المرور',
+    sendResetLink: 'إرسال رابط إعادة التعيين',
     confirmPassword: 'تأكيد كلمة المرور',
     rememberMe: 'تذكرني',
     forgotPassword: 'نسيت كلمة المرور؟',
     noAccount: 'ليس لديك حساب؟',
     haveAccount: 'لديك حساب بالفعل؟',
+    passwords: {
+      sent: 'إذا كان البريد الإلكتروني مسجلاً، فقد تم إرسال رابط إعادة التعيين.',
+      resetSuccess: 'تم إعادة تعيين كلمة المرور بنجاح!',
+    },
   },
   errors: {
     notFound: 'غير موجود',
@@ -531,6 +538,9 @@ export default {
     serverError: 'خطأ في الخادم',
     networkError: 'خطأ في الشبكة',
     tryAgain: 'حاول مرة أخرى',
+    invalidLink: 'رابط غير صالح',
+    invalidToken: 'رمز غير صالح أو منتهي الصلاحية',
+    passwordMismatch: 'كلمة المرور غير متطابقة',
   },
   devicesPage: {
     monitoring: 'مراقبة وإدارة عقد التتبع IoT عبر القطيع.',

@@ -27,6 +27,27 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\HandleCors::class,
         ]);
     })
+    ->withCommands()
+    ->withProviders([
+        \Illuminate\Filesystem\FilesystemServiceProvider::class,
+        \Illuminate\Database\DatabaseServiceProvider::class,
+        \Illuminate\Database\MigrationServiceProvider::class,
+        \Illuminate\Foundation\Providers\ArtisanServiceProvider::class,
+        \Illuminate\Foundation\Providers\ComposerServiceProvider::class,
+        \App\Providers\AppServiceProvider::class,
+        \Illuminate\Cache\CacheServiceProvider::class,
+        \Illuminate\Encryption\EncryptionServiceProvider::class,
+        \Illuminate\Hashing\HashServiceProvider::class,
+        \Illuminate\Translation\TranslationServiceProvider::class,
+        \Illuminate\Validation\ValidationServiceProvider::class,
+        \Illuminate\Auth\AuthServiceProvider::class,
+        \Illuminate\Cookie\CookieServiceProvider::class,
+        \Illuminate\Session\SessionServiceProvider::class,
+        \Illuminate\View\ViewServiceProvider::class,
+        \Illuminate\Mail\MailServiceProvider::class,
+        \Illuminate\Queue\QueueServiceProvider::class,
+        \Illuminate\Redis\RedisServiceProvider::class,
+    ])
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

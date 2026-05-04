@@ -519,11 +519,18 @@ export default {
     register: 'Register',
     email: 'Email',
     password: 'Password',
+    newPassword: 'New Password',
+    resetPassword: 'Reset Password',
+    sendResetLink: 'Send Reset Link',
     confirmPassword: 'Confirm Password',
     rememberMe: 'Remember me',
     forgotPassword: 'Forgot password?',
     noAccount: "Don't have an account?",
     haveAccount: 'Already have an account?',
+    passwords: {
+      sent: 'If that email exists, a reset link has been sent.',
+      resetSuccess: 'Password reset successfully!',
+    },
   },
   errors: {
     notFound: 'Not Found',
@@ -531,6 +538,9 @@ export default {
     serverError: 'Server Error',
     networkError: 'Network Error',
     tryAgain: 'Try Again',
+    invalidLink: 'Invalid reset link',
+    invalidToken: 'Invalid or expired reset token',
+    passwordMismatch: 'Passwords do not match',
   },
   devicesPage: {
     monitoring: 'Monitor and manage your IoT tracking nodes across the herd.',

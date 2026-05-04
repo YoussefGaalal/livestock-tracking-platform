@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { MaterialSymbol } from 'react-material-symbols';
 import { resetPassword, verifyResetToken } from '../utils/api';
+import { useI18n } from '../i18n';
+import { usePlatform } from '../context/PlatformContext';
 
 export default function ResetPassword() {
+  const { t, dir } = useI18n();
+  const { platformName } = usePlatform();
+  const isRtl = dir === 'rtl';
+
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const email = searchParams.get('email');
@@ -15,7 +22,7 @@ export default function ResetPassword() {
   useEffect(() => {
     if (!token || !email) {
       setStatus('error');
-      setMessage('Invalid reset link');
+      setMessage(t('errors.invalidLink') || 'Invalid reset link');
       return;
     }
 
@@ -23,7 +30,7 @@ export default function ResetPassword() {
       .then(() => setStatus('idle'))
       .catch(() => {
         setStatus('error');
-        setMessage('Invalid or expired reset token');
+        setMessage(t('errors.invalidToken') || 'Invalid or expired reset token');
       });
   }, [token, email]);
 
@@ -31,7 +38,7 @@ export default function ResetPassword() {
     e.preventDefault();
     
     if (password !== passwordConfirmation) {
-      setMessage('Passwords do not match');
+      setMessage(t('errors.passwordMismatch') || 'Passwords do not match');
       return;
     }
 
@@ -40,96 +47,140 @@ export default function ResetPassword() {
     try {
       const response = await resetPassword(email, token, password, passwordConfirmation);
       setStatus('success');
-      setMessage('Password reset successfully!');
+      setMessage(t('passwords.resetSuccess') || 'Password reset successfully!');
     } catch (error) {
       setStatus('error');
-      setMessage(error.response?.data?.message || 'Failed to reset password');
+      setMessage(error.response?.data?.message || t('errors.serverError'));
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Reset Password
-          </h2>
+    <div className={`min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-[#FAF1F5] via-[#F4F4EF] to-[#E3E3DE] ${isRtl ? 'rtl' : 'ltr'}`}>
+      <div className="flex-1 flex items-center justify-center relative">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-[#eeeee9]/30" />
+          <div
+            className="w-full h-full"
+            style={{
+              background: 'linear-gradient(135deg, rgba(0, 40, 25, 0.85), rgba(6, 64, 43, 0.7)), url(https://images.unsplash.com/photo-1542332213-31f87348057f?q=80&w=2070&auto=format&fit=crop)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          />
         </div>
 
-        {status === 'verifying' && (
-          <div className="text-center">Verifying reset token...</div>
-        )}
-
-        {status === 'success' && (
-          <div className="rounded-md bg-green-50 p-4">
-            <div className="text-sm text-green-800">{message}</div>
-            <div className="mt-4">
-              <Link to="/login" className="text-sm font-medium text-green-600 hover:text-green-500">
-                Proceed to login
-              </Link>
-            </div>
-          </div>
-        )}
-
-        {(status === 'idle' || status === 'error') && (
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                New Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                minLength={8}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Minimum 8 characters"
-              />
+        <div className="relative z-10 w-full max-w-md mx-6">
+          <div className="bg-white/95 backdrop-blur-xl p-10 md:p-12 rounded-3xl shadow-[0_24px_64px_rgba(6,64,43,0.15)]">
+            <div className="flex flex-col items-center mb-10">
+              <div className="w-18 h-18 bg-gradient-to-br from-[#002819] to-[#06402B] rounded-2xl flex items-center justify-center mb-5 shadow-xl shadow-[#002819]/30">
+                <MaterialSymbol icon="lock_reset" size={36} className="text-[#D4AF37]" weight="fill" />
+              </div>
+              <h1 className="text-4xl font-black text-[#002819] font-['Manrope'] tracking-tight mb-2">
+                {t('auth.resetPassword') || 'Reset Password'}
+              </h1>
+              <p className="text-[#404943] font-medium">{platformName}</p>
             </div>
 
-            <div>
-              <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-700">
-                Confirm Password
-              </label>
-              <input
-                id="password_confirmation"
-                name="password_confirmation"
-                type="password"
-                required
-                value={passwordConfirmation}
-                onChange={(e) => setPasswordConfirmation(e.target.value)}
-                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Re-enter password"
-              />
-            </div>
-
-            {status === 'error' && (
-              <div className="rounded-md bg-red-50 p-4">
-                <div className="text-sm text-red-800">{message}</div>
+            {status === 'verifying' && (
+              <div className="text-center py-8 text-[#404943]">
+                <MaterialSymbol icon="hourglass_empty" size={48} className="mx-auto mb-4 text-[#717973]" />
+                {t('common.loading') || 'Verifying reset token...'}
               </div>
             )}
 
-            <div>
-              <button
-                type="submit"
-                disabled={status === 'loading'}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-              >
-                {status === 'loading' ? 'Resetting...' : 'Reset Password'}
-              </button>
-            </div>
+            {status === 'success' && (
+              <div className="rounded-xl bg-green-50 p-6 text-center">
+                <MaterialSymbol icon="check_circle" size={48} className="text-green-600 mx-auto mb-4" />
+                <div className="text-sm text-green-800 mb-4">{message}</div>
+                <Link to="/app/login" className="text-sm font-semibold text-[#06402B] hover:text-[#D4AF37] transition-colors">
+                  ← {t('auth.login') || 'Proceed to login'}
+                </Link>
+              </div>
+            )}
 
-            <div className="text-center">
-              <Link to="/login" className="text-sm font-medium text-blue-600 hover:text-blue-500">
-                Back to login
-              </Link>
-            </div>
-          </form>
-        )}
+            {(status === 'idle' || status === 'error') && (
+              <form className="space-y-5" onSubmit={handleSubmit}>
+                <div className="space-y-3">
+                  <label className={`block text-sm font-bold text-[#002819] px-1 ${isRtl ? 'text-right' : 'text-left'}`}>
+                    {t('auth.newPassword') || 'New Password'}
+                  </label>
+                  <div className="relative">
+                    <MaterialSymbol
+                      icon="lock"
+                      size={20}
+                      className={`absolute top-1/2 -translate-y-1/2 text-[#717973] ${isRtl ? 'right-5 left-auto' : 'left-5'}`}
+                    />
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      required
+                      minLength={8}
+                      className={`w-full bg-[#F4F4EF] rounded-xl py-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#06402B]/20 transition-all font-medium text-[#1a1c19] placeholder:text-[#c0c9c1] ${
+                        isRtl ? 'pr-14 pl-5 text-right' : 'pl-14 pr-5 text-left'
+                      }`}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <label className={`block text-sm font-bold text-[#002819] px-1 ${isRtl ? 'text-right' : 'text-left'}`}>
+                    {t('auth.confirmPassword') || 'Confirm Password'}
+                  </label>
+                  <div className="relative">
+                    <MaterialSymbol
+                      icon="lock"
+                      size={20}
+                      className={`absolute top-1/2 -translate-y-1/2 text-[#717973] ${isRtl ? 'right-5 left-auto' : 'left-5'}`}
+                    />
+                    <input
+                      type="password"
+                      value={passwordConfirmation}
+                      onChange={(e) => setPasswordConfirmation(e.target.value)}
+                      placeholder="••••••••"
+                      required
+                      minLength={8}
+                      className={`w-full bg-[#F4F4EF] rounded-xl py-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#06402B]/20 transition-all font-medium text-[#1a1c19] placeholder:text-[#c0c9c1] ${
+                        isRtl ? 'pr-14 pl-5 text-right' : 'pl-14 pr-5 text-left'
+                      }`}
+                    />
+                  </div>
+                </div>
+
+                {status === 'error' && (
+                  <div className="p-4 bg-[#BA1A1A]/10 text-[#BA1A1A] rounded-xl text-sm font-medium">
+                    {message}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={status === 'loading'}
+                  className={`w-full bg-gradient-to-br from-[#002819] to-[#06402B] text-[#D4AF37] font-bold py-5 rounded-2xl shadow-xl shadow-[#002819]/25 transition-all duration-200 hover:opacity-95 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 ${
+                    isRtl ? 'flex-row-reverse' : ''
+                  }`}
+                >
+                  <span className="font-bold">{status === 'loading' ? (t('common.loading') || 'Resetting...') : (t('auth.resetPassword') || 'Reset Password')}</span>
+                  {status === 'loading' ? (
+                    <div className="w-5 h-5 border-2 border-[#D4AF37] border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <MaterialSymbol icon="lock_reset" size={20} weight="fill" />
+                  )}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
       </div>
+
+      <footer className={`py-6 px-12 z-20 bg-[#06402B] ${isRtl ? 'flex-row-reverse' : ''}`}>
+        <div className={`flex justify-center items-center max-w-screen-2xl mx-auto ${isRtl ? 'flex-row-reverse' : ''}`}>
+          <p className="text-white/80 font-medium text-sm">
+            © 2024 {platformName}. Digital Majlis.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
