@@ -210,31 +210,31 @@ Route::delete('/subscription/admin/tiers/{tier}', [SubscriptionController::class
         Route::post('/admin/settings/twilio', [AdminSettingsController::class, 'saveTwilioSettings']);
         Route::get('/admin/settings/notifications', [AdminSettingsController::class, 'getNotificationSettings']);
         Route::post('/admin/settings/notifications', [AdminSettingsController::class, 'saveNotificationSettings']);
+
+        Route::get('/admin/languages', [LanguageController::class, 'allLanguages']);
+        Route::post('/admin/languages', [LanguageController::class, 'storeLanguage']);
+        Route::put('/admin/languages/{code}', [LanguageController::class, 'updateLanguage']);
+        Route::delete('/admin/languages/{code}', [LanguageController::class, 'deleteLanguage']);
+        Route::post('/admin/languages/{code}/set-default', [LanguageController::class, 'setDefaultLanguage']);
+
+        Route::post('/admin/translations', [LanguageController::class, 'storeTranslation']);
+        Route::put('/admin/translations/{id}', [LanguageController::class, 'updateTranslation']);
+        Route::delete('/admin/translations/{id}', [LanguageController::class, 'deleteTranslation']);
+        Route::post('/admin/translations/import', [LanguageController::class, 'importTranslations']);
+
+        Route::get('/admin/roles', [RoleManagementController::class, 'index']);
+        Route::post('/admin/roles', [RoleManagementController::class, 'storeRole']);
+        Route::put('/admin/roles/{role}', [RoleManagementController::class, 'updateRole']);
+        Route::delete('/admin/roles/{role}', [RoleManagementController::class, 'deleteRole']);
+        Route::get('/admin/users/{user}/roles', [RoleManagementController::class, 'getUserRoles']);
+        Route::put('/admin/users/{user}/roles', [RoleManagementController::class, 'updateUserRoles']);
     });
 
-    Route::get('/export/animals', [ExportController::class, 'exportAnimals']);
-    Route::get('/export/devices', [ExportController::class, 'exportDevices']);
-    Route::get('/export/geofences', [ExportController::class, 'exportGeofences']);
-    Route::get('/export/users', [ExportController::class, 'exportUsers']);
-    Route::get('/export/database', [ExportController::class, 'exportDatabase']);
-
-    Route::get('/admin/languages', [LanguageController::class, 'allLanguages']);
-    Route::post('/admin/languages', [LanguageController::class, 'storeLanguage']);
-    Route::put('/admin/languages/{code}', [LanguageController::class, 'updateLanguage']);
-    Route::delete('/admin/languages/{code}', [LanguageController::class, 'deleteLanguage']);
-    Route::post('/admin/languages/{code}/set-default', [LanguageController::class, 'setDefaultLanguage']);
-
-    Route::post('/admin/translations', [LanguageController::class, 'storeTranslation']);
-    Route::put('/admin/translations/{id}', [LanguageController::class, 'updateTranslation']);
-    Route::delete('/admin/translations/{id}', [LanguageController::class, 'deleteTranslation']);
-    Route::post('/admin/translations/import', [LanguageController::class, 'importTranslations']);
-
-    Route::get('/admin/roles', [RoleManagementController::class, 'index']);
-    Route::post('/admin/roles', [RoleManagementController::class, 'storeRole']);
-    Route::put('/admin/roles/{role}', [RoleManagementController::class, 'updateRole']);
-    Route::delete('/admin/roles/{role}', [RoleManagementController::class, 'deleteRole']);
-    Route::get('/admin/users/{user}/roles', [RoleManagementController::class, 'getUserRoles']);
-    Route::put('/admin/users/{user}/roles', [RoleManagementController::class, 'updateUserRoles']);
+        Route::get('/export/animals', [ExportController::class, 'exportAnimals']);
+        Route::get('/export/devices', [ExportController::class, 'exportDevices']);
+        Route::get('/export/geofences', [ExportController::class, 'exportGeofences']);
+        Route::get('/export/users', [ExportController::class, 'exportUsers']);
+        Route::get('/export/database', [ExportController::class, 'exportDatabase']);
 
     Route::get('/species', [SpeciesController::class, 'index']);
     Route::post('/species', [SpeciesController::class, 'store']);

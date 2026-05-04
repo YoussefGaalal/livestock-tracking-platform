@@ -60,10 +60,6 @@ class LanguageController extends Controller
             ->get()
             ->pluck('value', 'key');
         
-        $uiGrouped = [];
-        foreach ($uiTranslations as $key => $value) {
-        }
-        
         $modelTranslations = [];
         
         $species = DB::table('species')->get();
@@ -129,6 +125,11 @@ class LanguageController extends Controller
 
     public function allLanguages(Request $request)
     {
+        $user = $request->user();
+        if (!$user || !$user->hasPermissionTo('manage_languages')) {
+            return response()->json(['message' => 'Unauthorized. Admin role required.', 'error' => 'unauthorized'], 403);
+        }
+
         $languages = DB::table('languages')
             ->orderBy('sort_order')
             ->get();
@@ -138,6 +139,11 @@ class LanguageController extends Controller
 
     public function storeLanguage(Request $request)
     {
+        $user = $request->user();
+        if (!$user || !$user->hasPermissionTo('manage_languages')) {
+            return response()->json(['message' => 'Unauthorized. Admin role required.', 'error' => 'unauthorized'], 403);
+        }
+
         $validated = $request->validate([
             'code' => 'required|string|max:3|unique:languages,code|regex:/^[a-z]{2,3}$/',
             'name' => 'required|string|max:50',
@@ -164,6 +170,11 @@ class LanguageController extends Controller
 
     public function updateLanguage(Request $request, string $code)
     {
+        $user = $request->user();
+        if (!$user || !$user->hasPermissionTo('manage_languages')) {
+            return response()->json(['message' => 'Unauthorized. Admin role required.', 'error' => 'unauthorized'], 403);
+        }
+
         $validated = $request->validate([
             'name' => 'sometimes|string|max:50',
             'native_name' => 'sometimes|string|max:50',
@@ -190,6 +201,11 @@ class LanguageController extends Controller
 
     public function deleteLanguage(string $code)
     {
+        $user = request()->user();
+        if (!$user || !$user->hasPermissionTo('manage_languages')) {
+            return response()->json(['message' => 'Unauthorized. Admin role required.', 'error' => 'unauthorized'], 403);
+        }
+
         $language = DB::table('languages')->where('code', $code)->first();
         
         if (!$language) {
@@ -208,6 +224,11 @@ class LanguageController extends Controller
 
     public function setDefaultLanguage(string $code)
     {
+        $user = request()->user();
+        if (!$user || !$user->hasPermissionTo('manage_languages')) {
+            return response()->json(['message' => 'Unauthorized. Admin role required.', 'error' => 'unauthorized'], 403);
+        }
+
         $language = DB::table('languages')->where('code', $code)->first();
         
         if (!$language) {
@@ -222,6 +243,11 @@ class LanguageController extends Controller
 
     public function storeTranslation(Request $request)
     {
+        $user = $request->user();
+        if (!$user || !$user->hasPermissionTo('manage_languages')) {
+            return response()->json(['message' => 'Unauthorized. Admin role required.', 'error' => 'unauthorized'], 403);
+        }
+
         $validated = $request->validate([
             'language_code' => 'required|exists:languages,code',
             'group' => 'required|string|max:50',
@@ -258,6 +284,11 @@ class LanguageController extends Controller
 
     public function updateTranslation(Request $request, int $id)
     {
+        $user = $request->user();
+        if (!$user || !$user->hasPermissionTo('manage_languages')) {
+            return response()->json(['message' => 'Unauthorized. Admin role required.', 'error' => 'unauthorized'], 403);
+        }
+
         $validated = $request->validate([
             'value' => 'required|string',
         ]);
@@ -280,6 +311,11 @@ class LanguageController extends Controller
 
     public function deleteTranslation(int $id)
     {
+        $user = request()->user();
+        if (!$user || !$user->hasPermissionTo('manage_languages')) {
+            return response()->json(['message' => 'Unauthorized. Admin role required.', 'error' => 'unauthorized'], 403);
+        }
+
         $translation = DB::table('translations')->where('id', $id)->first();
         
         if (!$translation) {
@@ -293,6 +329,11 @@ class LanguageController extends Controller
 
     public function importTranslations(Request $request)
     {
+        $user = $request->user();
+        if (!$user || !$user->hasPermissionTo('manage_languages')) {
+            return response()->json(['message' => 'Unauthorized. Admin role required.', 'error' => 'unauthorized'], 403);
+        }
+
         $validated = $request->validate([
             'translations' => 'required|array',
         ]);

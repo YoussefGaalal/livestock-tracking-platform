@@ -23,6 +23,7 @@ class RoleSeeder extends Seeder
             'medical_record_view', 'medical_record_create', 'medical_record_edit',
             'vaccination_view', 'vaccination_create', 'vaccination_edit',
             'auction_view', 'auction_create', 'auction_edit', 'auction_bid',
+            'manage_languages',
         ];
 
         foreach ($permissions as $perm) {

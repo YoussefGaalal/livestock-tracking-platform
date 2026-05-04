@@ -75,6 +75,28 @@ i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false },
 });
 
+// Sync locale with backend on init
+if (typeof window !== 'undefined') {
+  const token = localStorage.getItem('oasis_token');
+  if (token) {
+    fetch('/api/auth/me', {
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+    })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.settings?.locale) {
+          const backendLocale = data.settings.locale;
+          const currentLocale = localStorage.getItem('i18nextLng') || 'en';
+          if (backendLocale !== currentLocale) {
+            localStorage.setItem('i18nextLng', backendLocale);
+            i18n.changeLanguage(backendLocale);
+          }
+        }
+      })
+      .catch(() => {});
+  }
+}
+
 export function useI18n() {
   const { t, i18n: i18nInstance } = useTranslation();
   return {
@@ -83,8 +105,18 @@ export function useI18n() {
     language: i18nInstance.language,
     changeLanguage: (lng) => {
       i18nInstance.changeLanguage(lng);
+      localStorage.setItem('i18nextLng', lng);
       document.documentElement.dir = lng === 'ar' ? 'rtl' : 'ltr';
       document.documentElement.lang = lng;
+      // Sync with backend
+      const token = localStorage.getItem('oasis_token');
+      if (token) {
+        fetch('/api/auth/locale', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ locale: lng })
+        }).catch(() => {});
+      }
     },
   };
 }
