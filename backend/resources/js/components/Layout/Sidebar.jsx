@@ -9,15 +9,16 @@ export default function Sidebar() {
 
    const isAdminOrOwner = user?.role === 'Admin' || user?.role === 'Owner';
    const isAdmin = user?.role === 'Admin';
-
-  const navItems = [
-    { icon: 'dashboard', label: t('nav.dashboard'), to: '/dashboard' },
-    ...(isAdminOrOwner ? [{ icon: 'group', label: t('nav.users'), to: '/users' }] : []),
-    { icon: 'pets', label: t('nav.animals'), to: '/animals' },
-    { icon: 'fence', label: t('nav.geofences'), to: '/geofences' },
-    { icon: 'medical_services', label: t('nav.medicalRecords'), to: '/medical-records' },
-    { icon: 'router', label: t('nav.devices'), to: '/devices' },
-    { icon: 'map', label: t('nav.mapView'), to: '/map' },
+   const canViewDevices = ['Admin', 'Owner', 'Manager', 'Shepherd'].includes(user?.role);
+  
+   const navItems = [
+     { icon: 'dashboard', label: t('nav.dashboard'), to: '/dashboard' },
+     ...(isAdminOrOwner ? [{ icon: 'group', label: t('nav.users'), to: '/users' }] : []),
+     { icon: 'pets', label: t('nav.animals'), to: '/animals' },
+     { icon: 'fence', label: t('nav.geofences'), to: '/geofences' },
+     { icon: 'medical_services', label: t('nav.medicalRecords'), to: '/medical-records' },
+     ...(canViewDevices ? [{ icon: 'router', label: t('nav.devices'), to: '/devices' }] : []),
+     { icon: 'map', label: t('nav.mapView'), to: '/map' },
     { icon: 'gavel', label: t('nav.auctions'), to: '/auctions' },
     { icon: 'notification_important', label: t('nav.alerts'), to: '/alerts' },
     { icon: 'task', label: t('nav.tasks'), to: '/tasks' },

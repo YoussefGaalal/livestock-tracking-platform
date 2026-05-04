@@ -9,12 +9,25 @@ use Illuminate\Http\JsonResponse;
 
 class MapController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $devices = Device::whereNotNull('gps_lat')
-            ->whereNotNull('gps_lng')
-            ->with('animal')
-            ->get()
+        $user = $request->user();
+        
+        $query = Device::whereNotNull('gps_lat')
+            ->whereNotNull('gps_lng');
+        
+        // Apply role-based filtering
+        if ($user && !$user->hasRole('Admin')) {
+            if ($user->hasRole('Owner')) {
+                $query->where('owner_id', $user->id);
+            } elseif ($user->managed_by) {
+                $query->where('owner_id', $user->managed_by);
+            } else {
+                return response()->json(['markers' => [], 'bounds' => null]);
+            }
+        }
+        
+        $devices = $query->with('animal')->get()
             ->map(function ($device) {
                 return [
                     'id' => $device->id,

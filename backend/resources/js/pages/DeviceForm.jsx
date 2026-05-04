@@ -6,7 +6,16 @@ import { useI18n } from '../i18n';
 
 export default function DeviceForm() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { t } = useI18n();
+  const canCreateDevices = ['Admin', 'Owner', 'Manager'].includes(user?.role);
+  
+  useEffect(() => {
+    if (!canCreateDevices) {
+      navigate('/devices');
+    }
+  }, [canCreateDevices, navigate]);
+  
   const [formData, setFormData] = useState({
     name: '',
     type: 'collar',

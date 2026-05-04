@@ -26,7 +26,7 @@ class CheckSubscriptionLimits
         }
 
         $tier = $user->subscriptionTier;
-        $isCreating = in_array($request->method(), ['POST', 'PUT', 'PATCH']);
+        $isCreating = $request->method() === 'POST';
 
         if (!$tier) {
             if ($isCreating) {

@@ -3,11 +3,21 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { MaterialSymbol } from 'react-material-symbols';
 import { apiFetch } from '../utils/api';
 import { useI18n } from '../i18n';
+import { useAuth } from '../context/AuthContext';
 
 export default function DeviceEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { t } = useI18n();
+  const canEditDevices = ['Admin', 'Owner', 'Manager'].includes(user?.role);
+  const canDeleteDevices = ['Admin', 'Owner'].includes(user?.role);
+  
+  useEffect(() => {
+    if (!canEditDevices) {
+      navigate('/devices');
+    }
+  }, [canEditDevices, navigate]);
   const [loading, setLoading] = useState(true);
   const [device, setDevice] = useState(null);
   const [animals, setAnimals] = useState([]);
@@ -284,12 +294,22 @@ export default function DeviceEdit() {
             </div>
           </section>
 
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row items-center justify-between pt-8 gap-4">
-            <button type="button" className="w-full sm:w-auto flex items-center justify-center gap-2 text-[#ba1a1a] font-bold px-6 py-3 rounded-xl hover:bg-[#ffdad6] transition-colors">
-              <MaterialSymbol icon="delete" size={20} />
-              Delete Device
-            </button>
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row items-center justify-between pt-8 gap-4">
+              {canDeleteDevices && (
+                <button type="button" onClick={async () => {
+                  if (!confirm(t('devicesPage.deleteConfirm', { deviceId: device?.device_id }))) return;
+                  try {
+                    const res = await apiFetch(`/api/devices/${id}`, { method: 'DELETE' });
+                    if (res.ok) {
+                      navigate('/devices');
+                    }
+                  } catch (err) { console.error(err); }
+                }} className="w-full sm:w-auto flex items-center justify-center gap-2 text-[#ba1a1a] font-bold px-6 py-3 rounded-xl hover:bg-[#ffdad6] transition-colors">
+                  <MaterialSymbol icon="delete" size={20} />
+                  Delete Device
+                </button>
+              )}
             <div className="flex gap-4 w-full sm:w-auto">
               <button
                 type="button"

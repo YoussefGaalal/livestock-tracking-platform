@@ -38,7 +38,7 @@ class DeviceController extends Controller
     {
         $authUser = $request->user();
         
-        if ($authUser && !$authUser->hasPermissionTo('manage_devices')) {
+        if ($authUser && !$authUser->hasPermissionTo('device_create')) {
             return response()->json(['message' => 'Unauthorized to create devices', 'error' => 'unauthorized'], 403);
         }
         
@@ -88,7 +88,7 @@ class DeviceController extends Controller
     {
         $authUser = $request->user();
         
-        if ($authUser && !$authUser->hasPermissionTo('manage_devices')) {
+        if ($authUser && !$authUser->hasPermissionTo('device_edit')) {
             return response()->json(['message' => 'Unauthorized', 'error' => 'unauthorized'], 403);
         }
         
@@ -120,7 +120,7 @@ class DeviceController extends Controller
     {
         $authUser = $request->user();
         
-        if ($authUser && !$authUser->hasPermissionTo('manage_devices')) {
+        if ($authUser && !$authUser->hasPermissionTo('device_delete')) {
             return response()->json(['message' => 'Unauthorized', 'error' => 'unauthorized'], 403);
         }
         

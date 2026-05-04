@@ -30,7 +30,10 @@ export default function DeviceList() {
   const [stats, setStats] = useState({ online: 0, offline: 0, lowBattery: 0, maintenance: 0 });
   
   const isAdmin = user?.role === 'Admin';
-
+  const canCreateDevices = ['Admin', 'Owner', 'Manager'].includes(user?.role);
+  const canEditDevices = ['Admin', 'Owner', 'Manager'].includes(user?.role);
+  const canDeleteDevices = ['Admin', 'Owner'].includes(user?.role);
+  
   useEffect(() => {
     fetchData();
     fetchStats();
@@ -151,13 +154,15 @@ export default function DeviceList() {
               {exporting ? t('common.exporting') : t('common.export')}
             </button>
           )}
-          <button
-            onClick={() => navigate('/devices/new')}
-            className="flex items-center gap-2 bg-[#002819] text-white px-6 py-3 rounded-xl font-['Manrope'] font-bold hover:shadow-lg transition-all active:scale-95"
-          >
-            <MaterialSymbol icon="add_circle" size={20} />
-            {t('devicesPage.registerNew')}
-          </button>
+          {canCreateDevices && (
+            <button
+              onClick={() => navigate('/devices/new')}
+              className="flex items-center gap-2 bg-[#002819] text-white px-6 py-3 rounded-xl font-['Manrope'] font-bold hover:shadow-lg transition-all active:scale-95"
+            >
+              <MaterialSymbol icon="add_circle" size={20} />
+              {t('devicesPage.registerNew')}
+            </button>
+          )}
         </div>
       </div>
 
@@ -305,24 +310,28 @@ export default function DeviceList() {
                     </td>
                     <td className="px-8 py-5">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Link
-                          to={`/devices/${device.id}/edit`}
-                          className="p-2 hover:bg-[#e8e8e3] rounded-lg text-[#404943] transition-all"
-                        >
-                          <MaterialSymbol icon="edit" size={20} />
-                        </Link>
-                        <button
-                          onClick={async () => {
-                            if (!confirm(t('devicesPage.deleteConfirm', { deviceId: device.device_id }))) return;
-                            try {
-                              const res = await fetch(`/api/devices/${device.id}`, { method: 'DELETE', headers: { Accept: 'application/json' } });
-                              if (res.ok) fetchData();
-                            } catch (err) { console.error(err); }
-                          }}
-                          className="p-2 hover:bg-red-100 rounded-lg text-red-600 transition-all"
-                        >
-                          <MaterialSymbol icon="delete" size={20} />
-                        </button>
+                        {canEditDevices && (
+                          <Link
+                            to={`/devices/${device.id}/edit`}
+                            className="p-2 hover:bg-[#e8e8e3] rounded-lg text-[#404943] transition-all"
+                          >
+                            <MaterialSymbol icon="edit" size={20} />
+                          </Link>
+                        )}
+                        {canDeleteDevices && (
+                          <button
+                            onClick={async () => {
+                              if (!confirm(t('devicesPage.deleteConfirm', { deviceId: device.device_id }))) return;
+                              try {
+                                const res = await fetch(`/api/devices/${device.id}`, { method: 'DELETE', headers: { Accept: 'application/json' } });
+                                if (res.ok) fetchData();
+                              } catch (err) { console.error(err); }
+                            }}
+                            className="p-2 hover:bg-red-100 rounded-lg text-red-600 transition-all"
+                          >
+                            <MaterialSymbol icon="delete" size={20} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
