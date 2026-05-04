@@ -56,16 +56,17 @@ export default function AIAssistant() {
 
   const fetchUserContext = async () => {
     try {
+      const token = localStorage.getItem('oasis_token');
       const headers = {
         'Content-Type': 'application/json',
-        'X-User-Id': user?.id?.toString() || '',
-        'X-User-Role': user?.role || '',
+        'Accept': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       };
 
       const [animalsRes, alertsRes, geofencesRes] = await Promise.all([
-        fetch('http://localhost:8050/api/animals', { headers }).catch(() => null),
-        fetch('http://localhost:8050/api/alerts', { headers }).catch(() => null),
-        fetch('http://localhost:8050/api/geofences', { headers }).catch(() => null),
+        fetch('/api/animals', { headers }).catch(() => null),
+        fetch('/api/geofence-alerts', { headers }).catch(() => null),
+        fetch('/api/geofences', { headers }).catch(() => null),
       ]);
 
       const [animals, alerts, geofences] = await Promise.all([

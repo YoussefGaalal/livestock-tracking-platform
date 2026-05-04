@@ -1,22 +1,12 @@
 import { getAuthHeaders } from './api';
 
-const API_BASE = 'http://localhost:8050';
+const API_BASE = '';
 
 export const exportData = async (endpoint, filename) => {
   try {
-    const userStr = localStorage.getItem('oasis_user');
-    const user = userStr ? JSON.parse(userStr) : null;
-    
-    const headers = {};
-    
-    if (user) {
-      headers['X-User-Id'] = String(user.id);
-      headers['X-User-Role'] = user.role || 'Owner';
-    }
-
     const response = await fetch(`${API_BASE}${endpoint}`, {
       method: 'GET',
-      headers,
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -32,7 +22,7 @@ export const exportData = async (endpoint, filename) => {
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
-    
+
     return true;
   } catch (error) {
     console.error('Export error:', error);
@@ -42,19 +32,9 @@ export const exportData = async (endpoint, filename) => {
 
 export const exportDatabase = async () => {
   try {
-    const userStr = localStorage.getItem('oasis_user');
-    const user = userStr ? JSON.parse(userStr) : null;
-    
-    const headers = {};
-    
-    if (user) {
-      headers['X-User-Id'] = String(user.id);
-      headers['X-User-Role'] = user.role || 'Owner';
-    }
-
     const response = await fetch(`${API_BASE}/api/export/database`, {
       method: 'GET',
-      headers,
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -70,7 +50,7 @@ export const exportDatabase = async () => {
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
-    
+
     return true;
   } catch (error) {
     console.error('Database export error:', error);

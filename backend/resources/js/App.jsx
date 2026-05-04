@@ -40,7 +40,7 @@ function App() {
     <I18nProvider>
       <AuthProvider>
         <PlatformProvider>
-          <BrowserRouter>
+          <BrowserRouter basename="/app">
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<Layout />}>

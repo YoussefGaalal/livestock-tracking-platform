@@ -1,6 +1,11 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
-const AuthContext = createContext({ user: null, isAuthenticated: false, login: async () => false, logout: () => {} });
+const AuthContext = createContext({
+  user: null,
+  isAuthenticated: false,
+  login: async () => false,
+  logout: () => {},
+});
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
@@ -8,7 +13,7 @@ export function AuthProvider({ children }) {
     return saved ? JSON.parse(saved) : null;
   });
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('oasis_user') !== null;
+    return !!localStorage.getItem('oasis_token');
   });
 
   useEffect(() => {
@@ -21,7 +26,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch('http://localhost:8050/api/login', {
+      const response = await fetch('/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -32,8 +37,13 @@ export function AuthProvider({ children }) {
 
       if (response.ok) {
         const data = await response.json();
-        setUser(data.user || { id: 0, email, name: 'User', role: 'Admin', phone: null });
+        // Store BOTH the user profile and the Bearer token
+        const userData = data.user || { id: 0, email, name: 'User', role: 'Admin', phone: null };
+        setUser(userData);
         setIsAuthenticated(true);
+        if (data.token) {
+          localStorage.setItem('oasis_token', data.token);
+        }
         return true;
       }
     } catch (error) {
@@ -46,6 +56,7 @@ export function AuthProvider({ children }) {
     setUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem('oasis_user');
+    localStorage.removeItem('oasis_token');
   };
 
   return (

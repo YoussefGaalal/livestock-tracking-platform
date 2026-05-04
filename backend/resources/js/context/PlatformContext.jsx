@@ -2,8 +2,6 @@ import { createContext, useContext, useState, useEffect } from 'react';
 
 const PlatformContext = createContext();
 
-const API_BASE = 'http://localhost:8050';
-
 export function PlatformProvider({ children }) {
   const [platformName, setPlatformName] = useState('The Oasis');
   const [loading, setLoading] = useState(true);
@@ -11,7 +9,9 @@ export function PlatformProvider({ children }) {
   useEffect(() => {
     const fetchPlatformName = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/admin/settings/general`);
+        const res = await fetch('/api/admin/settings/general', {
+          headers: { Accept: 'application/json' },
+        });
         if (res.ok) {
           const data = await res.json();
           if (data.data?.platform_name) {
@@ -20,7 +20,8 @@ export function PlatformProvider({ children }) {
           }
         }
       } catch (error) {
-        console.error('Failed to fetch platform name:', error);
+        // Non-fatal — default name stays
+        console.warn('Could not fetch platform name:', error);
       } finally {
         setLoading(false);
       }
@@ -30,7 +31,9 @@ export function PlatformProvider({ children }) {
 
   const refreshPlatformName = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/admin/settings/general`);
+      const res = await fetch('/api/admin/settings/general', {
+        headers: { Accept: 'application/json' },
+      });
       if (res.ok) {
         const data = await res.json();
         if (data.data?.platform_name) {
@@ -39,7 +42,7 @@ export function PlatformProvider({ children }) {
         }
       }
     } catch (error) {
-      console.error('Failed to refresh platform name:', error);
+      console.warn('Could not refresh platform name:', error);
     }
   };
 
