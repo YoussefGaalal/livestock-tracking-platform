@@ -6,10 +6,10 @@ cmds = [
   "mkdir -p bootstrap/cache storage/framework/sessions storage/framework/views storage/framework/cache storage/logs",
   "chmod -R 777 bootstrap/cache storage",
   "composer install --no-dev --optimize-autoloader",
-  "php artisan package:discover --ansi",
+  "php create-packages.php",
   "npm install",
   "npm run build"
 ]
 
 [start]
-cmd = "chmod -R 777 bootstrap/cache storage && php artisan migrate --force && php artisan db:seed --class=SubscriptionTierSeeder --force && php artisan db:seed --class=RoleSeeder --force && php artisan db:seed --class=UserSeeder --force && php -S 0.0.0.0:$PORT -t public"
+cmd = "mkdir -p bootstrap/cache storage/framework/sessions storage/framework/views storage/framework/cache storage/logs && chmod -R 777 bootstrap/cache storage && php create-packages.php && php artisan migrate --force && php artisan db:seed --class=SubscriptionTierSeeder --force && php artisan db:seed --class=RoleSeeder --force && php artisan db:seed --class=UserSeeder --force && php -S 0.0.0.0:$PORT -t public"
