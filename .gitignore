@@ -64,6 +64,9 @@ Pre-Deployment-Security-Review.docx
 # ----- Stray root-level Laravel file ------------------------
 /artisan
 
+# ----- Nested duplicate folder -----------------------------
+backend/backend/
+
 # ----- OS & Editor ------------------------------------------
 .DS_Store
 Thumbs.db
