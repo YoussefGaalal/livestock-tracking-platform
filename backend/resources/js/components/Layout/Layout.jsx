@@ -72,7 +72,7 @@ export default function Layout() {
     if (item.path === '/medical-records') return medicalSubmenu;
     if (item.path === '/auctions') return auctionSubmenu.filter(subItem => {
       if (subItem.adminOnly && user?.role !== 'Admin') return false;
-      if (subItem.ownerOnly && !['Admin', 'Owner', 'Manager'].includes(user?.role)) return false;
+      if (subItem.ownerOnly && !['Admin', 'Owner'].includes(user?.role)) return false;
       return true;
     });
     if (item.path === '/users') return usersSubmenu.filter(subItem => {
@@ -81,7 +81,7 @@ export default function Layout() {
     });
     if (item.path === '/tasks') return tasksSubmenu.filter(subItem => {
       if (subItem.adminOnly && user?.role !== 'Admin') return false;
-      if (subItem.ownerOnly && !['Admin', 'Owner', 'Manager'].includes(user?.role)) return false;
+      if (subItem.ownerOnly && !['Admin', 'Owner'].includes(user?.role)) return false;
       return true;
     });
     return null;

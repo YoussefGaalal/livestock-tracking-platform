@@ -37,8 +37,9 @@ export function AuthProvider({ children }) {
 
       if (response.ok) {
         const data = await response.json();
-        // Store BOTH the user profile and the Bearer token
-        const userData = data.user || { id: 0, email, name: 'User', role: 'Admin', phone: null };
+         // Store BOTH the user profile and the Bearer token
+         if (!data.user) return false;
+         const userData = data.user;
         setUser(userData);
         setIsAuthenticated(true);
         if (data.token) {

@@ -14,6 +14,8 @@ class RoleMiddleware
      * Usage in routes:
      * ->middleware('role:Admin,Owner')
      * ->middleware('role:Admin,Owner,Manager|session')
+     * 
+     * @deprecated Use CheckRole middleware with Spatie instead
      */
     public function handle(Request $request, Closure $next, string $roles): Response
     {
@@ -23,19 +25,17 @@ class RoleMiddleware
             return response()->json(['error' => 'Unauthenticated'], 401);
         }
 
-        $userRole = $user->role;
-        
-        // Parse roles parameter (can be comma-separated)
+        // Use Spatie's role checking instead of deprecated $user->role column
         $allowedRoles = explode(',', $roles);
+        $allowedRoles = array_map('trim', $allowedRoles);
         
-        // Check if user role is allowed
-        if (!in_array($userRole, $allowedRoles)) {
-            return response()->json([
-                'error' => 'Forbidden',
-                'message' => "Access denied. Required roles: $roles. Your role: $userRole"
-            ], 403);
+        if ($user->hasAnyRole($allowedRoles)) {
+            return $next($request);
         }
-
-        return $next($request);
+        
+        return response()->json([
+            'error' => 'Forbidden',
+            'message' => "Access denied. Required roles: $roles. Your role: " . $user->roles->first()?->name ?? 'none'
+        ], 403);
     }
 }

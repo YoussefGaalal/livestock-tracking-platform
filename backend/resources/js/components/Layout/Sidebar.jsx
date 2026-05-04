@@ -7,8 +7,8 @@ export default function Sidebar() {
   const { t, dir } = useI18n();
   const { user } = useAuth();
 
-  const isAdminOrOwner = user?.role === 'admin' || user?.role === 'owner';
-  const isAdmin = user?.role === 'admin';
+   const isAdminOrOwner = user?.role === 'Admin' || user?.role === 'Owner';
+   const isAdmin = user?.role === 'Admin';
 
   const navItems = [
     { icon: 'dashboard', label: t('nav.dashboard'), to: '/dashboard' },
