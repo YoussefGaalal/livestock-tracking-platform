@@ -174,7 +174,7 @@ export default function Login() {
               <div className={`flex justify-between items-center px-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
                 <label className="text-sm font-bold text-[#002819]">{t('auth.password')}</label>
                 {isLogin && (
-                  <a className="text-xs font-semibold text-[#D4AF37] hover:underline" href="#">
+                  <a className="text-xs font-semibold text-[#D4AF37] hover:underline" href="/app/forgot-password">
                     {t('auth.forgotPassword')}
                   </a>
                 )}

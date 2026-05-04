@@ -34,6 +34,8 @@ import ProfilePage from './pages/ProfilePage';
 import MedicalRecordsPage from './pages/MedicalRecordsPage';
 import VaccinationSchedulePage from './pages/VaccinationSchedulePage';
 import SettingsPage from './pages/SettingsPage';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   return (
@@ -43,6 +45,8 @@ function App() {
           <BrowserRouter basename="/app">
             <Routes>
               <Route path="/login" element={<Login />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/" element={<Layout />}>
                 <Route index element={<Navigate to="/dashboard" replace />} />
                 <Route path="dashboard" element={<Dashboard />} />

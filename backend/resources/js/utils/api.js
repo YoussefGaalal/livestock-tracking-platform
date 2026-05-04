@@ -38,3 +38,50 @@ export const apiFetch = async (url, options = {}) => {
 
   return fetch(fullUrl, fetchOptions);
 };
+
+export const requestPasswordReset = async (email) => {
+  const response = await apiFetch('/api/auth/forgot-password', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw { response: { data: error } };
+  }
+
+  return response.json();
+};
+
+export const resetPassword = async (email, token, password, passwordConfirmation) => {
+  const response = await apiFetch('/api/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify({
+      email,
+      token,
+      password,
+      password_confirmation: passwordConfirmation,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw { response: { data: error } };
+  }
+
+  return response.json();
+};
+
+export const verifyResetToken = async (email, token) => {
+  const response = await apiFetch('/api/auth/verify-reset-token', {
+    method: 'POST',
+    body: JSON.stringify({ email, token }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw { response: { data: error } };
+  }
+
+  return response.json();
+};

@@ -197,10 +197,15 @@ class AuthController extends Controller
             'password_reset_expires' => now()->addHours(24),
         ]);
 
-        $resetUrl = "oasis://reset-password?token={$token}&email=" . urlencode($user->email);
-        
-        // TODO: Integrate with email service
-        // Mail::to($user->email)->send(new ResetPasswordMail($user, $resetUrl));
+        $resetUrl = config('app.frontend_url', env('FRONTEND_URL', 'http://localhost:5173')) . "/reset-password?token={$token}&email=" . urlencode($user->email);
+         
+        // Send email with reset link
+        try {
+            \Mail::to($user->email)->send(new \App\Mail\ResetPasswordMail($user, $resetUrl));
+        } catch (\Exception $e) {
+            // Log error but don't expose to user
+            \Log::error('Failed to send password reset email: ' . $e->getMessage());
+        }
 
         return response()->json([
             'message' => 'If that email exists, a reset link has been sent.',
