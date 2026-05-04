@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MaterialSymbol } from 'react-material-symbols';
 import { useAuth } from '../context/AuthContext';
-import { useI18n } from '../i18n';
+import { useI18n } from '../i18n.jsx';
 import { usePlatform } from '../context/PlatformContext';
 
 export default function Login() {
@@ -73,6 +73,25 @@ export default function Login() {
 
   return (
     <div className={`min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-br from-[#FAF1F5] via-[#F4F4EF] to-[#E3E3DE] ${isRtl ? 'rtl' : 'ltr'}`}>
+       {/* Language Switcher */}
+       <div className={`absolute top-6 z-20 ${isRtl ? 'left-6' : 'right-6'}`}>
+         <div className="flex items-center gap-1 bg-white/80 backdrop-blur-md rounded-full p-1 shadow-lg border border-[#E3E3DE]">
+           {['en', 'ar'].map((lng) => (
+             <button
+               key={lng}
+               onClick={() => changeLanguage(lng)}
+               className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                 language === lng
+                   ? 'bg-[#002819] text-[#D4AF37] shadow-md'
+                   : 'text-[#404943] hover:text-[#002819]'
+               }`}
+             >
+               {lng === 'en' ? 'EN' : 'ع'}
+             </button>
+           ))}
+         </div>
+       </div>
+
        <div className="flex-1 flex items-center justify-center relative">
        <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-[#eeeee9]/30" />

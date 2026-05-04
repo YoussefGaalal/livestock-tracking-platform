@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import { I18nProvider } from './i18n';
+import { I18nProvider } from './i18n.jsx';
 import { PlatformProvider } from './context/PlatformContext';
 import Layout from './components/Layout/Layout';
 import Dashboard from './pages/Dashboard';
