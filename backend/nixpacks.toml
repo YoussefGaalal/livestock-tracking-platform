@@ -10,4 +10,4 @@ cmds = [
 ]
 
 [start]
-cmd = "php artisan optimize:clear && php artisan migrate --force && php artisan db:seed --class=SubscriptionTierSeeder --force && php artisan db:seed --class=RoleSeeder --force && php artisan db:seed --class=UserSeeder --force && php -S 0.0.0.0:$PORT -t public"
+cmd = "php artisan optimize:clear && php artisan package:discover --ansi && php artisan migrate --force && php artisan db:seed --class=SubscriptionTierSeeder --force && php artisan db:seed --class=RoleSeeder --force && php artisan db:seed --class=UserSeeder --force && php -S 0.0.0.0:$PORT -t public"
