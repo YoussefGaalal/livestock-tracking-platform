@@ -19,9 +19,21 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:52164', 'http://localhost:56507', 'http://localhost:62781', 'http://localhost:55109', 'http://localhost:8080', 'http://localhost:3000', 'http://localhost:5173', 'http://localhost:54263', 'http://localhost:50097', 'http://localhost:49824', 'http://127.0.0.1:52164', 'http://127.0.0.1:56507', 'http://127.0.0.1:62781', 'http://127.0.0.1:55109', 'http://127.0.0.1:8080', 'http://127.0.0.1:5173', '*'],
+    // NOTE: '*' cannot be used together with supports_credentials: true (browsers reject it).
+    // List explicit origins. For local Flutter dev, any localhost port is allowed via the pattern below.
+    'allowed_origins' => [
+        'https://oasis-trace-production.up.railway.app',
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://localhost:8080',
+        'http://127.0.0.1:8080',
+    ],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => [
+        // Allow any localhost port — covers Flutter debug builds on any emulator/device port
+        '#^http://localhost:\d+$#',
+        '#^http://127\.0\.0\.1:\d+$#',
+    ],
 
     'allowed_headers' => ['*'],
 

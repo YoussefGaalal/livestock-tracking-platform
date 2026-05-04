@@ -25,12 +25,14 @@ class User extends Authenticatable
         'phone',
         'location',
         'language',
-        'subscription_tier',
         'subscription_status',
         'avatar_url',
         'is_active',
         'subscription_tier_id',
         'managed_by',
+        'settings',
+        'password_reset_token',
+        'password_reset_expires',
     ];
 
     protected $hidden = [
@@ -39,6 +41,7 @@ class User extends Authenticatable
 
     protected $casts = [
         'is_active' => 'boolean',
+        'settings'  => 'array',
     ];
 
     public function animals()
