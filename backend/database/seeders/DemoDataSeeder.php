@@ -28,11 +28,27 @@ class DemoDataSeeder extends Seeder
 {
     public function run(): void
     {
-        // Skip if already seeded
-        if (Animal::count() > 0) {
+        // Skip only if fully seeded (18 animals + groups present)
+        if (Animal::count() >= 18 && AnimalGroup::count() >= 4) {
             echo "DemoDataSeeder: data already present — skipping.\n";
             return;
         }
+
+        // Clean up any partial previous run before re-seeding
+        \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        \App\Models\VaccinationSchedule::truncate();
+        \App\Models\MedicalRecord::truncate();
+        \App\Models\Bid::truncate();
+        \App\Models\Auction::truncate();
+        \App\Models\Task::truncate();
+        \App\Models\GeofenceAlert::truncate();
+        \App\Models\LocationHistory::truncate();
+        \App\Models\Device::truncate();
+        \App\Models\Geofence::truncate();
+        AnimalGroup::truncate();
+        Animal::truncate();
+        \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        echo "DemoDataSeeder: cleaned partial data, reseeding...\n";
 
         $khalid = User::where('email', 'khalid@oasis.com')->first();
         $ahmad  = User::where('email', 'ahmad@oasis.com')->first();
