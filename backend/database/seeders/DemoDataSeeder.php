@@ -232,10 +232,9 @@ class DemoDataSeeder extends Seeder
                 for ($h = 0; $h < 4; $h++) {
                     LocationHistory::create([
                         'animal_id'   => $animal->id,
-                        'device_id'   => $devices[$i]->device_id,
+                        'device_id'   => $devices[$i]->id,
                         'latitude'    => $base['lat'] + (rand(-60, 60) / 10000),
                         'longitude'   => $base['lng'] + (rand(-60, 60) / 10000),
-                        'altitude'    => rand(10, 80),
                         'speed'       => rand(0, 14),
                         'recorded_at' => now()->subDays($day)->subHours($h * 6),
                     ]);
@@ -325,19 +324,20 @@ class DemoDataSeeder extends Seeder
         echo "Created " . count($alertDefs) . " geofence alerts.\n";
 
         // ── Tasks ─────────────────────────────────────────────────────────────
+        // task_type ENUM: inspection | medical | feeding | movement | other
         $taskDefs = [
-            ['title' => 'Morning health inspection — Sultan & Reem',   'type' => 'health_check', 'priority' => 'high',   'status' => 'pending',     'due' => now()->addHours(2),  'animal' => $animals[0]],
-            ['title' => 'Administer FMD vaccination — Zain & Layla',   'type' => 'vaccination',  'priority' => 'high',   'status' => 'pending',     'due' => now()->addHours(4),  'animal' => $animals[5]],
-            ['title' => 'GPS collar battery replacement — DEV-007',    'type' => 'maintenance',  'priority' => 'urgent', 'status' => 'in_progress', 'due' => now()->addHours(1),  'animal' => null],
-            ['title' => 'Hessa veterinary follow-up (respiratory)',    'type' => 'health_check', 'priority' => 'urgent', 'status' => 'in_progress', 'due' => now()->addHours(3),  'animal' => $animals[7]],
-            ['title' => 'Move Racing Camels group to Northern Pasture','type' => 'movement',     'priority' => 'medium', 'status' => 'pending',     'due' => now()->addDays(1),   'animal' => null],
-            ['title' => 'Weigh and record all sheep — Noor & Faris',  'type' => 'health_check', 'priority' => 'medium', 'status' => 'pending',     'due' => now()->addDays(2),   'animal' => $animals[8]],
-            ['title' => 'Cattle deworming — Rawda & Jabir',           'type' => 'treatment',    'priority' => 'medium', 'status' => 'pending',     'due' => now()->addDays(3),   'animal' => $animals[10]],
-            ['title' => 'Clean and disinfect water troughs',          'type' => 'maintenance',  'priority' => 'low',    'status' => 'pending',     'due' => now()->addDays(4),   'animal' => null],
-            ['title' => 'Brucellosis test — Noor (overdue)',          'type' => 'health_check', 'priority' => 'urgent', 'status' => 'in_progress', 'due' => now()->subDays(3),   'animal' => $animals[8]],
-            ['title' => 'PPR booster — Layla & Hessa',               'type' => 'vaccination',  'priority' => 'high',   'status' => 'completed',   'due' => now()->subDays(2),   'animal' => $animals[6]],
-            ['title' => 'Monthly weight recording — all animals',     'type' => 'health_check', 'priority' => 'medium', 'status' => 'completed',   'due' => now()->subDays(5),   'animal' => null],
-            ['title' => 'Check and repair Restricted Zone A fence',   'type' => 'inspection',   'priority' => 'high',   'status' => 'completed',   'due' => now()->subDays(6),   'animal' => null],
+            ['title' => 'Morning health inspection — Sultan & Reem',   'type' => 'inspection', 'priority' => 'high',   'status' => 'pending',     'due' => now()->addHours(2),  'animal' => $animals[0]],
+            ['title' => 'Administer FMD vaccination — Zain & Layla',   'type' => 'medical',    'priority' => 'high',   'status' => 'pending',     'due' => now()->addHours(4),  'animal' => $animals[5]],
+            ['title' => 'GPS collar battery replacement — DEV-007',    'type' => 'other',      'priority' => 'urgent', 'status' => 'in_progress', 'due' => now()->addHours(1),  'animal' => null],
+            ['title' => 'Hessa veterinary follow-up (respiratory)',    'type' => 'medical',    'priority' => 'urgent', 'status' => 'in_progress', 'due' => now()->addHours(3),  'animal' => $animals[7]],
+            ['title' => 'Move Racing Camels group to Northern Pasture','type' => 'movement',   'priority' => 'medium', 'status' => 'pending',     'due' => now()->addDays(1),   'animal' => null],
+            ['title' => 'Weigh and record all sheep — Noor & Faris',  'type' => 'inspection', 'priority' => 'medium', 'status' => 'pending',     'due' => now()->addDays(2),   'animal' => $animals[8]],
+            ['title' => 'Cattle deworming — Rawda & Jabir',           'type' => 'medical',    'priority' => 'medium', 'status' => 'pending',     'due' => now()->addDays(3),   'animal' => $animals[10]],
+            ['title' => 'Clean and disinfect water troughs',          'type' => 'other',      'priority' => 'low',    'status' => 'pending',     'due' => now()->addDays(4),   'animal' => null],
+            ['title' => 'Brucellosis test — Noor (overdue)',          'type' => 'medical',    'priority' => 'urgent', 'status' => 'in_progress', 'due' => now()->subDays(3),   'animal' => $animals[8]],
+            ['title' => 'PPR booster — Layla & Hessa',               'type' => 'medical',    'priority' => 'high',   'status' => 'completed',   'due' => now()->subDays(2),   'animal' => $animals[6]],
+            ['title' => 'Monthly weight recording — all animals',     'type' => 'inspection', 'priority' => 'medium', 'status' => 'completed',   'due' => now()->subDays(5),   'animal' => null],
+            ['title' => 'Check and repair Restricted Zone A fence',   'type' => 'inspection', 'priority' => 'high',   'status' => 'completed',   'due' => now()->subDays(6),   'animal' => null],
         ];
 
         foreach ($taskDefs as $td) {
