@@ -3,11 +3,12 @@ nixPkgs = ["php84", "php84Extensions.pdo_mysql", "php84Extensions.mbstring", "ph
 
 [phases.install]
 cmds = [
-  "rm -f bootstrap/cache/*.php",
-  "composer install --no-dev",
+  "mkdir -p bootstrap/cache storage/framework/sessions storage/framework/views storage/framework/cache storage/logs",
+  "chmod -R 775 bootstrap/cache storage",
+  "composer install --no-dev --optimize-autoloader",
   "npm install",
   "npm run build"
 ]
 
 [start]
-cmd = "php artisan optimize:clear && php artisan package:discover --ansi && php artisan migrate --force && php artisan db:seed --class=SubscriptionTierSeeder --force && php artisan db:seed --class=RoleSeeder --force && php artisan db:seed --class=UserSeeder --force && php -S 0.0.0.0:$PORT -t public"
+cmd = "chmod -R 775 bootstrap/cache storage && php artisan migrate --force && php artisan db:seed --class=SubscriptionTierSeeder --force && php artisan db:seed --class=RoleSeeder --force && php artisan db:seed --class=UserSeeder --force && php -S 0.0.0.0:$PORT -t public"
