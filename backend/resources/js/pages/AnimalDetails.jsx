@@ -308,14 +308,14 @@ const fetchAnimal = async () => {
             </div>
             <span className="flex items-center gap-1">
               <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-              <span className="text-[10px] font-bold text-emerald-600">Live</span>
+              <span className="text-[10px] font-bold text-emerald-600">{t('animalPage.live')}</span>
             </span>
           </div>
-          <p className="text-[#404943] text-sm font-medium mb-1">Current Activity</p>
-          <div className="flex items-baseline gap-1">
-            <h4 className="text-3xl font-extrabold text-[#1a1c19] brand-font">{currentPosition ? 'Moving' : 'No Data'}</h4>
-          </div>
-          <p className="mt-4 text-[11px] text-[#404943]/60 font-medium">{positions.length} points tracked</p>
+            <p className="text-[#404943] text-sm font-medium mb-1">{t('animalPage.currentActivity')}</p>
+            <div className="flex items-baseline gap-1">
+              <h4 className="text-3xl font-extrabold text-[#1a1c19] brand-font">{currentPosition ? t('animalPage.moving') : t('animalPage.noData')}</h4>
+            </div>
+            <p className="mt-4 text-[11px] text-[#404943]/60 font-medium">{positions.length} {t('animalPage.pointsTracked')}</p>
         </div>
 
         {/* Battery */}
@@ -324,11 +324,11 @@ const fetchAnimal = async () => {
             <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl">
               <MaterialSymbol icon="battery_5_bar" />
             </div>
-            <span className="text-[10px] font-bold text-[#404943] bg-[#eeeee9] px-2 py-1 rounded-full">
-              {device?.device_id || 'No Device'}
-            </span>
+              <span className="text-[10px] font-bold text-[#404943] bg-[#eeeee9] px-2 py-1 rounded-full">
+                {device?.device_id || t('animalPage.noDeviceAssigned')}
+              </span>
           </div>
-          <p className="text-[#404943] text-sm font-medium mb-1">Sensor Battery</p>
+            <p className="text-[#404943] text-sm font-medium mb-1">{t('animalPage.sensorBattery')}</p>
           <div className="flex items-baseline gap-1">
             <h4 className="text-3xl font-extrabold text-[#1a1c19] brand-font">{device?.battery_level || '0'}</h4>
             <span className="text-[#404943] font-bold">%</span>
@@ -343,53 +343,53 @@ const fetchAnimal = async () => {
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Basic Information */}
         <div className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-[#c0c9c1]/5">
-          <h3 className="text-xl font-bold text-[#002819] brand-font mb-6">Basic Information</h3>
+          <h3 className="text-xl font-bold text-[#002819] brand-font mb-6">{t('animalPage.basicInfo')}</h3>
           <div className="space-y-4">
             <div className="flex justify-between items-center py-3 border-b border-[#eeeee9]">
-              <span className="text-[#404943]">Animal ID</span>
+              <span className="text-[#404943]">{t('animalPage.animalId')}</span>
               <span className="font-bold text-[#1a1c19]">{animal.animal_id}</span>
             </div>
             <div className="flex justify-between items-center py-3 border-b border-[#eeeee9]">
-              <span className="text-[#404943]">Species</span>
+              <span className="text-[#404943]">{t('animalPage.species')}</span>
               <span className="font-bold text-[#1a1c19]">{animal.species}</span>
             </div>
             <div className="flex justify-between items-center py-3 border-b border-[#eeeee9]">
-              <span className="text-[#404943]">Breed</span>
-              <span className="font-bold text-[#1a1c19]">{animal.breed || 'Not specified'}</span>
+              <span className="text-[#404943]">{t('animalPage.breed')}</span>
+              <span className="font-bold text-[#1a1c19]">{animal.breed || t('animalPage.notSpecified')}</span>
             </div>
             <div className="flex justify-between items-center py-3 border-b border-[#eeeee9]">
-              <span className="text-[#404943]">Gender</span>
+              <span className="text-[#404943]">{t('animalPage.gender')}</span>
               <span className="font-bold text-[#1a1c19]">{animal.gender}</span>
             </div>
             <div className="flex justify-between items-center py-3 border-b border-[#eeeee9]">
-              <span className="text-[#404943]">Date of Birth</span>
-              <span className="font-bold text-[#1a1c19]">{animal.date_of_birth || 'Not specified'}</span>
+              <span className="text-[#404943]">{t('animalPage.dateOfBirth')}</span>
+              <span className="font-bold text-[#1a1c19]">{animal.date_of_birth || t('animalPage.notSpecified')}</span>
             </div>
             <div className="flex justify-between items-center py-3">
-              <span className="text-[#404943]">Weight</span>
-              <span className="font-bold text-[#1a1c19]">{animal.current_weight ? `${animal.current_weight} kg` : 'Not specified'}</span>
+              <span className="text-[#404943]">{t('animalPage.weight')}</span>
+              <span className="font-bold text-[#1a1c19]">{animal.current_weight ? `${animal.current_weight} kg` : t('animalPage.notSpecified')}</span>
             </div>
           </div>
         </div>
 
         {/* Health Benchmarks */}
         <div className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-[#c0c9c1]/5">
-          <h3 className="text-xl font-bold text-[#002819] brand-font mb-6">Health Benchmarks</h3>
+          <h3 className="text-xl font-bold text-[#002819] brand-font mb-6">{t('animalPage.healthBenchmarks')}</h3>
           <div className="space-y-4">
             <div className="flex justify-between items-center py-3 border-b border-[#eeeee9]">
-              <span className="text-[#404943]">Baseline Temp</span>
+              <span className="text-[#404943]">{t('animalPage.baselineTemp')}</span>
               <span className="font-bold text-[#1a1c19]">{animal.baseline_temperature ? `${animal.baseline_temperature}°C` : '38.5°C'}</span>
             </div>
             <div className="flex justify-between items-center py-3 border-b border-[#eeeee9]">
-              <span className="text-[#404943]">Normal Heart Rate</span>
+              <span className="text-[#404943]">{t('animalPage.normalHeartRate')}</span>
               <span className="font-bold text-[#1a1c19]">{animal.normal_heart_rate ? `${animal.normal_heart_rate} BPM` : '30-50 BPM'}</span>
             </div>
             <div className="flex justify-between items-center py-3 border-b border-[#eeeee9]">
-              <span className="text-[#404943]">Tracking Device</span>
-              <span className="font-bold text-[#1a1c19]">{device?.device_id || 'Not assigned'}</span>
+              <span className="text-[#404943]">{t('animalPage.trackingDevice')}</span>
+              <span className="font-bold text-[#1a1c19]">{device?.device_id || t('animalPage.notAssigned')}</span>
             </div>
             <div className="flex justify-between items-center py-3 border-b border-[#eeeee9]">
-              <span className="text-[#404943]">Device Status</span>
+              <span className="text-[#404943]">{t('animalPage.deviceStatus')}</span>
               <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                 device?.status === 'online' ? 'bg-emerald-100 text-emerald-700' :
                 device?.status === 'low_signal' ? 'bg-amber-100 text-amber-700' :
@@ -399,7 +399,7 @@ const fetchAnimal = async () => {
               </span>
             </div>
             <div className="flex justify-between items-center py-3">
-              <span className="text-[#404943]">Color/Markings</span>
+              <span className="text-[#404943]">{t('animalPage.colorMarkings')}</span>
               <span className="font-bold text-[#1a1c19]">{animal.color_markings || 'Not specified'}</span>
             </div>
           </div>
@@ -410,13 +410,13 @@ const fetchAnimal = async () => {
       <section className="bg-white rounded-[2.5rem] shadow-sm border border-[#c0c9c1]/5 overflow-hidden mb-8">
         <div className="p-6 flex justify-between items-center border-b border-[#eeeee9]">
           <div>
-            <h3 className="text-xl font-bold text-[#002819] brand-font">Live Location & Movement Path</h3>
-            <p className="text-sm text-[#404943]/70 font-medium mt-1">Last 48 hours of tracking data</p>
+            <h3 className="text-xl font-bold text-[#002819] brand-font">{t('animalPage.locationPath')}</h3>
+            <p className="text-sm text-[#404943]/70 font-medium mt-1">{t('animalPage.trackingDataPeriod')}</p>
           </div>
-          <Link to="/map" className="text-emerald-700 font-bold text-sm hover:text-emerald-900 flex items-center gap-2">
-            View Full Map
-            <MaterialSymbol icon="open_in_new" size={18} />
-          </Link>
+            <Link to="/map" className="text-emerald-700 font-bold text-sm hover:text-emerald-900 flex items-center gap-2">
+              {t('animalPage.viewFullMap')}
+              <MaterialSymbol icon="open_in_new" size={18} />
+            </Link>
         </div>
         <div className="h-[450px] relative z-0">
           {positions.length > 0 ? (
@@ -452,8 +452,8 @@ const fetchAnimal = async () => {
             <div className="h-full flex items-center justify-center bg-gradient-to-br from-emerald-100 to-emerald-200">
               <div className="text-center">
                 <MaterialSymbol icon="location_off" size={64} className="text-emerald-300 mx-auto mb-4" />
-                <p className="text-emerald-700 font-bold text-lg">No Tracking Data Available</p>
-                <p className="text-emerald-600 text-sm mt-2">This animal has no location history in the last 30 days</p>
+                <p className="text-emerald-700 font-bold text-lg">{t('animalPage.noTrackingData')}</p>
+                <p className="text-emerald-600 text-sm mt-2">{t('animalPage.noLocationHistory')}</p>
                 {device?.gps_lat && device?.gps_lng && (
                   <p className="text-emerald-500 text-xs mt-1">Last known: {device.gps_lat}, {device.gps_lng}</p>
                 )}
@@ -466,9 +466,9 @@ const fetchAnimal = async () => {
       {/* Alert History */}
 <section className="bg-white rounded-[2.5rem] shadow-sm border border-[#c0c9c1]/5 overflow-hidden">
         <div className="p-10 flex justify-between items-center border-b border-[#eeeee9]">
-          <h3 className="text-2xl font-bold text-[#002819] brand-font">Recent Activity</h3>
+          <h3 className="text-2xl font-bold text-[#002819] brand-font">{t('animalPage.recentActivity')}</h3>
           <Link to="/alerts" className="text-sm font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-2">
-            View All Activity Log
+            {t('alertsPage.viewAll')}
             <MaterialSymbol icon="arrow_forward" />
           </Link>
         </div>
@@ -476,7 +476,7 @@ const fetchAnimal = async () => {
           {activityHistory.length === 0 ? (
             <div className="px-10 py-8 text-center text-[#717973]">
               <MaterialSymbol icon="history" size={32} className="mx-auto mb-2 opacity-50" />
-              <p>No recent activity recorded</p>
+              <p>{t('animalPage.noActivity')}</p>
             </div>
           ) : (
             activityHistory.slice(0, 5).map((alert) => (

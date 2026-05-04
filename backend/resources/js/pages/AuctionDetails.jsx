@@ -3,10 +3,12 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { MaterialSymbol } from 'react-material-symbols';
 import { apiFetch } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import { useI18n } from '../i18n';
 
 export default function AuctionDetails() {
   const { id } = useParams();
   const { user } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [auction, setAuction] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -234,9 +236,9 @@ export default function AuctionDetails() {
             <MaterialSymbol icon="arrow_back" />
           </Link>
           <nav className="flex text-xs text-[#4f6357] uppercase tracking-widest font-bold">
-            <span>Marketplace</span>
+            <span>{t('auctionPage.marketplace')}</span>
             <span className="mx-2">/</span>
-            <span>Auction #{id}</span>
+            <span>{t('auctionPage.auction')} #{id}</span>
           </nav>
         </div>
         <div className="flex items-center gap-3">
@@ -246,7 +248,7 @@ export default function AuctionDetails() {
               className="px-4 py-2 bg-[#002819] text-white rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-[#06402b] transition-colors"
             >
               <MaterialSymbol icon="edit" size={16} />
-              Edit
+              {t('common.edit')}
             </Link>
           )}
           {canManageAuction && auction.status === 'active' && (
@@ -256,7 +258,7 @@ export default function AuctionDetails() {
               className="px-4 py-2 bg-red-600 text-white rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-red-700 transition-colors disabled:opacity-50"
             >
               <MaterialSymbol icon="stop" size={16} />
-              {endingAuction ? 'Ending...' : 'End Auction'}
+              {endingAuction ? t('common.loading') : t('auctionPage.endAuction')}
             </button>
           )}
         </div>
@@ -300,7 +302,7 @@ export default function AuctionDetails() {
           {auction.status === 'sold' && (
             <div className="mt-4 p-4 bg-white rounded-xl">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="font-bold text-[#002819]">Payment Status</h4>
+                <h4 className="font-bold text-[#002819]">{t('auctionPage.paymentStatus')}</h4>
                 <span className={`px-3 py-1 rounded-full text-sm font-bold ${
                   auction.payment_status === 'verified' ? 'bg-emerald-100 text-emerald-700' :
                   auction.payment_status === 'submitted' ? 'bg-blue-100 text-blue-700' :
@@ -325,7 +327,7 @@ export default function AuctionDetails() {
                       className="px-4 py-2 bg-blue-600 text-white rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-blue-700"
                     >
                       <MaterialSymbol icon="credit_card" size={16} />
-                      Pay Now
+                      {t('auctionPage.payNow')}
                     </button>
                     <input
                       ref={fileInputRef}
@@ -454,26 +456,26 @@ export default function AuctionDetails() {
 
           {/* Description */}
           <div className="bg-white rounded-[2rem] p-8 shadow-sm">
-            <h3 className="text-xl font-bold text-[#002819] font-['Manrope'] mb-4">About This Animal</h3>
+                <h3 className="text-xl font-bold text-[#002819] font-['Manrope'] mb-4">{t('auctionPage.aboutAnimal')}</h3>
             <p className="text-[#404943] leading-relaxed">
               {auction.description || 'No description provided for this auction.'}
             </p>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-8 border-t border-[#eeeee9]">
               <div>
-                <p className="text-xs font-bold text-[#404943] uppercase tracking-widest mb-1">Temperature</p>
+                <p className="text-xs font-bold text-[#404943] uppercase tracking-widest mb-1">{t('auctionPage.temperature')}</p>
                 <p className="text-lg font-bold text-[#002819]">{auction.animal?.baseline_temperature || '38.5'}°C</p>
               </div>
               <div>
-                <p className="text-xs font-bold text-[#404943] uppercase tracking-widest mb-1">Heart Rate</p>
+                <p className="text-xs font-bold text-[#404943] uppercase tracking-widest mb-1">{t('auctionPage.heartRate')}</p>
                 <p className="text-lg font-bold text-[#002819]">{auction.animal?.normal_heart_rate || '30-50'} BPM</p>
               </div>
               <div>
-                <p className="text-xs font-bold text-[#404943] uppercase tracking-widest mb-1">Weight</p>
+                <p className="text-xs font-bold text-[#404943] uppercase tracking-widest mb-1">{t('auctionPage.weight')}</p>
                 <p className="text-lg font-bold text-[#002819]">{auction.animal?.current_weight || 'N/A'} kg</p>
               </div>
               <div>
-                <p className="text-xs font-bold text-[#404943] uppercase tracking-widest mb-1">Color</p>
+                <p className="text-xs font-bold text-[#404943] uppercase tracking-widest mb-1">{t('auctionPage.color')}</p>
                 <p className="text-lg font-bold text-[#002819]">{auction.animal?.color_markings || 'N/A'}</p>
               </div>
             </div>
@@ -481,9 +483,9 @@ export default function AuctionDetails() {
 
           {/* Bid History */}
           <div className="bg-white rounded-[2rem] p-8 shadow-sm">
-            <h3 className="text-xl font-bold text-[#002819] font-['Manrope'] mb-6">
-              Bid History ({auction.bids?.length || 0} bids)
-            </h3>
+              <h3 className="text-xl font-bold text-[#002819] font-['Manrope'] mb-6">
+                {t('auctionPage.bidHistory')} ({auction.bids?.length || 0} {t('auctionPage.bids').toLowerCase()})
+              </h3>
             
             {auction.bids && auction.bids.length > 0 ? (
               <div className="space-y-4">

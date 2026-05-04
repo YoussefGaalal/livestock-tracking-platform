@@ -86,7 +86,7 @@ export default function Login() {
                    : 'text-[#404943] hover:text-[#002819]'
                }`}
              >
-               {lng === 'en' ? 'EN' : 'ع'}
+               {lng === 'en' ? t('common.languageEn') : t('common.languageAr')}
              </button>
            ))}
          </div>
@@ -307,9 +307,9 @@ export default function Login() {
 
        <footer className={`py-6 px-12 z-20 bg-[#06402B] ${isRtl ? 'flex-row-reverse' : ''}`}>
          <div className={`flex justify-center items-center max-w-screen-2xl mx-auto ${isRtl ? 'flex-row-reverse' : ''}`}>
-             <p className="text-white/80 font-medium text-sm">
-             © 2024 {platformName}. Digital Majlis.
-           </p>
+            <p className="text-white/80 font-medium text-sm">
+              {t('platform.copyright', { name: platformName })}
+            </p>
          </div>
        </footer>
     </div>

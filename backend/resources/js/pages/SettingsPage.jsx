@@ -4,6 +4,7 @@ import { apiFetch } from '../utils/api';
 import { exportDatabase } from '../utils/export';
 import { useI18n } from '../i18n';
 import { usePlatform } from '../context/PlatformContext';
+import TranslationManagement from './Settings/TranslationManagement';
 
 export default function SettingsPage() {
   const { t, dir } = useI18n();
@@ -280,12 +281,13 @@ export default function SettingsPage() {
 
   const tabs = [
     { id: 'general', label: t('settings.general'), icon: 'settings' },
-    { id: 'species', label: 'Species', icon: 'pets' },
+    { id: 'species', label: t('settings.species'), icon: 'pets' },
     { id: 'smtp', label: t('settings.smtp'), icon: 'mail' },
     { id: 'stripe', label: t('settings.stripe'), icon: 'credit_card' },
     { id: 'gemini', label: t('settings.gemini'), icon: 'psychology' },
     { id: 'whatsapp', label: t('settings.whatsapp'), icon: 'chat' },
     { id: 'twilio', label: t('settings.twilio'), icon: 'sms' },
+    { id: 'translations', label: t('settings.language'), icon: 'translate' },
   ];
 
   if (loading) {
@@ -955,6 +957,11 @@ export default function SettingsPage() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Translations Tab */}
+      {activeTab === 'translations' && (
+        <TranslationManagement />
       )}
     </div>
   );

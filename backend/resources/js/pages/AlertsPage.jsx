@@ -461,21 +461,21 @@ return true;
             </div>
             <div className="space-y-3 mt-4">
               <div className="flex items-center gap-4">
-                <span className="text-[10px] font-bold text-[#717973] w-20">NORTH GATE</span>
+                <span className="text-[10px] font-bold text-[#717973] w-20">{t('alertsPage.northGate')}</span>
                 <div className="flex-1 h-2 bg-[#eeeee9] rounded-full overflow-hidden">
                   <div className="h-full bg-[#002819] w-[85%] rounded-full"></div>
                 </div>
                 <span className="text-xs font-black text-[#002819]">85%</span>
               </div>
               <div className="flex items-center gap-4">
-                <span className="text-[10px] font-bold text-[#717973] w-20">WATERING HOLE</span>
+                <span className="text-[10px] font-bold text-[#717973] w-20">{t('alertsPage.warningHole')}</span>
                 <div className="flex-1 h-2 bg-[#eeeee9] rounded-full overflow-hidden">
                   <div className="h-full bg-[#002819] w-[12%] rounded-full"></div>
                 </div>
                 <span className="text-xs font-black text-[#002819]">12%</span>
               </div>
               <div className="flex items-center gap-4">
-                <span className="text-[10px] font-bold text-[#717973] w-20">EAST SECTOR</span>
+                <span className="text-[10px] font-bold text-[#717973] w-20">{t('alertsPage.eastSector')}</span>
                 <div className="flex-1 h-2 bg-[#eeeee9] rounded-full overflow-hidden">
                   <div className="h-full bg-[#002819] w-[3%] rounded-full"></div>
                 </div>

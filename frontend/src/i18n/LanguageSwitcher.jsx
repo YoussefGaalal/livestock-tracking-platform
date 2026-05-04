@@ -11,7 +11,7 @@ const defaultLanguages = [
 ];
 
 export default function LanguageSwitcher() {
-  const { locale, setLocale, languages } = useI18n();
+  const { locale, setLocale, languages, t } = useI18n();
   const langList = languages?.length > 0 ? languages : defaultLanguages;
   const currentLang = langList.find(l => l.code === locale);
 
@@ -27,7 +27,7 @@ export default function LanguageSwitcher() {
         value={locale}
         onChange={handleChange}
         className="px-3 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 transition-all text-brand-primary font-semibold text-sm border-none cursor-pointer"
-        title={locale === 'en' ? 'Switch language' : 'تغيير اللغة'}
+        title={t('common.switchLanguage')}
       >
         {langList.map(lang => (
           <option key={lang.code} value={lang.code}>
