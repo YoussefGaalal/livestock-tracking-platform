@@ -3,7 +3,7 @@
     "type": "project",
     "description": "The Oasis - Livestock Tracking Platform",
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^2.9",
