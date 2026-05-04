@@ -47,26 +47,26 @@ class DemoDataSeeder extends Seeder
         // Variety: Camels, Arabian Horses, Goats, Sheep, Cattle, Donkeys
         $animalsData = [
             // ── Khalid's herd (12 animals, varied species) ──────────────────
-            ['name' => 'Sultan',   'species' => 'Camel',         'breed' => 'Dromedary',       'gender' => 'male',   'dob' => '2019-03-15', 'weight' => 525.0, 'temp' => 37.5, 'hr' => 42, 'status' => 'healthy',  'color' => 'Brown with white patch',  'owner' => $khalid],
-            ['name' => 'Reem',     'species' => 'Camel',         'breed' => 'Dromedary',       'gender' => 'female', 'dob' => '2020-06-22', 'weight' => 480.0, 'temp' => 37.8, 'hr' => 44, 'status' => 'healthy',  'color' => 'Light beige',             'owner' => $khalid],
-            ['name' => 'Majd',     'species' => 'Camel',         'breed' => 'Racing Dromedary','gender' => 'male',   'dob' => '2021-01-10', 'weight' => 455.0, 'temp' => 37.3, 'hr' => 40, 'status' => 'healthy',  'color' => 'Dark brown',              'owner' => $khalid],
-            ['name' => 'Ghazal',   'species' => 'Arabian Horse', 'breed' => 'Arabian',         'gender' => 'female', 'dob' => '2018-09-04', 'weight' => 410.0, 'temp' => 37.9, 'hr' => 36, 'status' => 'healthy',  'color' => 'Chestnut',                'owner' => $khalid],
-            ['name' => 'Buraaq',   'species' => 'Arabian Horse', 'breed' => 'Arabian',         'gender' => 'male',   'dob' => '2017-04-18', 'weight' => 460.0, 'temp' => 37.7, 'hr' => 38, 'status' => 'healthy',  'color' => 'Grey dapple',             'owner' => $khalid],
-            ['name' => 'Zain',     'species' => 'Goat',          'breed' => 'Damascus',        'gender' => 'male',   'dob' => '2022-04-05', 'weight' => 64.0,  'temp' => 38.2, 'hr' => 78, 'status' => 'healthy',  'color' => 'Black and white',         'owner' => $khalid],
-            ['name' => 'Layla',    'species' => 'Goat',          'breed' => 'Damascus',        'gender' => 'female', 'dob' => '2022-07-18', 'weight' => 56.0,  'temp' => 38.0, 'hr' => 80, 'status' => 'healthy',  'color' => 'White',                   'owner' => $khalid],
-            ['name' => 'Hessa',    'species' => 'Goat',          'breed' => 'Arabian Goat',    'gender' => 'female', 'dob' => '2023-02-01', 'weight' => 48.0,  'temp' => 38.5, 'hr' => 82, 'status' => 'sick',     'color' => 'Spotted brown/white',     'owner' => $khalid],
-            ['name' => 'Noor',     'species' => 'Sheep',         'breed' => 'Awassi',          'gender' => 'female', 'dob' => '2021-11-30', 'weight' => 73.0,  'temp' => 39.1, 'hr' => 75, 'status' => 'healthy',  'color' => 'White with black face',   'owner' => $khalid],
-            ['name' => 'Faris',    'species' => 'Sheep',         'breed' => 'Najdi',           'gender' => 'male',   'dob' => '2020-09-14', 'weight' => 90.0,  'temp' => 38.9, 'hr' => 72, 'status' => 'healthy',  'color' => 'Brown with long ears',    'owner' => $khalid],
-            ['name' => 'Rawda',    'species' => 'Cattle',        'breed' => 'Friesian',        'gender' => 'female', 'dob' => '2019-07-22', 'weight' => 520.0, 'temp' => 38.6, 'hr' => 65, 'status' => 'healthy',  'color' => 'Black and white',         'owner' => $khalid],
-            ['name' => 'Jabir',    'species' => 'Cattle',        'breed' => 'Brahman',         'gender' => 'male',   'dob' => '2018-11-05', 'weight' => 680.0, 'temp' => 38.4, 'hr' => 62, 'status' => 'healthy',  'color' => 'Light grey',              'owner' => $khalid],
+            ['name' => 'Sultan',   'species' => 'Camel',         'breed' => 'Dromedary',       'gender' => 'male',   'dob' => '2019-03-15', 'weight' => 525.0, 'temp' => 37.5, 'hr' => 42, 'color' => 'Brown with white patch',  'owner' => $khalid],
+            ['name' => 'Reem',     'species' => 'Camel',         'breed' => 'Dromedary',       'gender' => 'female', 'dob' => '2020-06-22', 'weight' => 480.0, 'temp' => 37.8, 'hr' => 44, 'color' => 'Light beige',             'owner' => $khalid],
+            ['name' => 'Majd',     'species' => 'Camel',         'breed' => 'Racing Dromedary','gender' => 'male',   'dob' => '2021-01-10', 'weight' => 455.0, 'temp' => 37.3, 'hr' => 40, 'color' => 'Dark brown',              'owner' => $khalid],
+            ['name' => 'Ghazal',   'species' => 'Arabian Horse', 'breed' => 'Arabian',         'gender' => 'female', 'dob' => '2018-09-04', 'weight' => 410.0, 'temp' => 37.9, 'hr' => 36, 'color' => 'Chestnut',                'owner' => $khalid],
+            ['name' => 'Buraaq',   'species' => 'Arabian Horse', 'breed' => 'Arabian',         'gender' => 'male',   'dob' => '2017-04-18', 'weight' => 460.0, 'temp' => 37.7, 'hr' => 38, 'color' => 'Grey dapple',             'owner' => $khalid],
+            ['name' => 'Zain',     'species' => 'Goat',          'breed' => 'Damascus',        'gender' => 'male',   'dob' => '2022-04-05', 'weight' => 64.0,  'temp' => 38.2, 'hr' => 78, 'color' => 'Black and white',         'owner' => $khalid],
+            ['name' => 'Layla',    'species' => 'Goat',          'breed' => 'Damascus',        'gender' => 'female', 'dob' => '2022-07-18', 'weight' => 56.0,  'temp' => 38.0, 'hr' => 80, 'color' => 'White',                   'owner' => $khalid],
+            ['name' => 'Hessa',    'species' => 'Goat',          'breed' => 'Arabian Goat',    'gender' => 'female', 'dob' => '2023-02-01', 'weight' => 48.0,  'temp' => 38.5, 'hr' => 82, 'color' => 'Spotted brown/white',     'owner' => $khalid],
+            ['name' => 'Noor',     'species' => 'Sheep',         'breed' => 'Awassi',          'gender' => 'female', 'dob' => '2021-11-30', 'weight' => 73.0,  'temp' => 39.1, 'hr' => 75, 'color' => 'White with black face',   'owner' => $khalid],
+            ['name' => 'Faris',    'species' => 'Sheep',         'breed' => 'Najdi',           'gender' => 'male',   'dob' => '2020-09-14', 'weight' => 90.0,  'temp' => 38.9, 'hr' => 72, 'color' => 'Brown with long ears',    'owner' => $khalid],
+            ['name' => 'Rawda',    'species' => 'Cattle',        'breed' => 'Friesian',        'gender' => 'female', 'dob' => '2019-07-22', 'weight' => 520.0, 'temp' => 38.6, 'hr' => 65, 'color' => 'Black and white',         'owner' => $khalid],
+            ['name' => 'Jabir',    'species' => 'Cattle',        'breed' => 'Brahman',         'gender' => 'male',   'dob' => '2018-11-05', 'weight' => 680.0, 'temp' => 38.4, 'hr' => 62, 'color' => 'Light grey',              'owner' => $khalid],
 
             // ── Ahmad's animals (6 animals) ─────────────────────────────────
-            ['name' => 'Badr',     'species' => 'Camel',         'breed' => 'Dromedary',       'gender' => 'male',   'dob' => '2018-05-20', 'weight' => 560.0, 'temp' => 37.6, 'hr' => 41, 'status' => 'healthy',  'color' => 'Dark grey',               'owner' => $ahmad],
-            ['name' => 'Warda',    'species' => 'Arabian Horse', 'breed' => 'Arabian',         'gender' => 'female', 'dob' => '2017-08-12', 'weight' => 420.0, 'temp' => 37.9, 'hr' => 36, 'status' => 'healthy',  'color' => 'Bay',                     'owner' => $ahmad],
-            ['name' => 'Sahm',     'species' => 'Arabian Horse', 'breed' => 'Arabian',         'gender' => 'male',   'dob' => '2016-12-03', 'weight' => 450.0, 'temp' => 37.7, 'hr' => 38, 'status' => 'healthy',  'color' => 'Black',                   'owner' => $ahmad],
-            ['name' => 'Dana',     'species' => 'Sheep',         'breed' => 'Awassi',          'gender' => 'female', 'dob' => '2022-03-25', 'weight' => 68.0,  'temp' => 39.0, 'hr' => 74, 'status' => 'healthy',  'color' => 'White',                   'owner' => $ahmad],
-            ['name' => 'Murad',    'species' => 'Goat',          'breed' => 'Nubian',          'gender' => 'male',   'dob' => '2023-05-10', 'weight' => 52.0,  'temp' => 38.3, 'hr' => 79, 'status' => 'healthy',  'color' => 'Brown with white spots',  'owner' => $ahmad],
-            ['name' => 'Suhail',   'species' => 'Donkey',        'breed' => 'Arabian Donkey',  'gender' => 'male',   'dob' => '2015-01-30', 'weight' => 180.0, 'temp' => 37.5, 'hr' => 48, 'status' => 'healthy',  'color' => 'Grey',                    'owner' => $ahmad],
+            ['name' => 'Badr',     'species' => 'Camel',         'breed' => 'Dromedary',       'gender' => 'male',   'dob' => '2018-05-20', 'weight' => 560.0, 'temp' => 37.6, 'hr' => 41, 'color' => 'Dark grey',               'owner' => $ahmad],
+            ['name' => 'Warda',    'species' => 'Arabian Horse', 'breed' => 'Arabian',         'gender' => 'female', 'dob' => '2017-08-12', 'weight' => 420.0, 'temp' => 37.9, 'hr' => 36, 'color' => 'Bay',                     'owner' => $ahmad],
+            ['name' => 'Sahm',     'species' => 'Arabian Horse', 'breed' => 'Arabian',         'gender' => 'male',   'dob' => '2016-12-03', 'weight' => 450.0, 'temp' => 37.7, 'hr' => 38, 'color' => 'Black',                   'owner' => $ahmad],
+            ['name' => 'Dana',     'species' => 'Sheep',         'breed' => 'Awassi',          'gender' => 'female', 'dob' => '2022-03-25', 'weight' => 68.0,  'temp' => 39.0, 'hr' => 74, 'color' => 'White',                   'owner' => $ahmad],
+            ['name' => 'Murad',    'species' => 'Goat',          'breed' => 'Nubian',          'gender' => 'male',   'dob' => '2023-05-10', 'weight' => 52.0,  'temp' => 38.3, 'hr' => 79, 'color' => 'Brown with white spots',  'owner' => $ahmad],
+            ['name' => 'Suhail',   'species' => 'Donkey',        'breed' => 'Arabian Donkey',  'gender' => 'male',   'dob' => '2015-01-30', 'weight' => 180.0, 'temp' => 37.5, 'hr' => 48, 'color' => 'Grey',                    'owner' => $ahmad],
         ];
 
         $animals = [];
@@ -80,7 +80,6 @@ class DemoDataSeeder extends Seeder
                 'current_weight'       => $d['weight'],
                 'baseline_temperature' => $d['temp'],
                 'normal_heart_rate'    => $d['hr'],
-                'health_status'        => $d['status'],
                 'color_markings'       => $d['color'],
                 'owner_id'             => $d['owner']->id,
             ]);
