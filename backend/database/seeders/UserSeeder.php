@@ -64,11 +64,11 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($users as $userData) {
-            $role = $userData['role'];
+            $roleName = $userData['role'];
             unset($userData['role']);
             
             $user = User::updateOrCreate(['email' => $userData['email']], $userData);
-            $spatieRole = Role::where('name', $role)->first();
+            $spatieRole = Role::where('name', $roleName)->first();
             if ($spatieRole) {
                 $user->syncRoles([$spatieRole]);
             }
