@@ -16,8 +16,9 @@ backend/bootstrap/cache/*.php
 backend/public/hot
 backend/public/storage
 
-# Compiled React frontend output (built by Railway, not committed)
-backend/public/app/
+# Compiled React frontend output — commit it so Railway always has a working build.
+# (Railway also rebuilds on deploy, but this is a reliable fallback.)
+# backend/public/app/    ← intentionally NOT ignored
 
 # ----- Flutter / Dart ---------------------------------------
 mobile/.dart_tool/
@@ -42,7 +43,9 @@ node_modules/
 *-analysis-report.html
 *-analysis-report.json
 Backend_Deep_Analysis.html
-*.html
+# NOTE: Do NOT use *.html here — it would block backend/public/app/index.html
+# Instead list specific files:
+/Backend_Deep_Analysis.html
 
 
 # ----- Word temp files --------------------------------------
