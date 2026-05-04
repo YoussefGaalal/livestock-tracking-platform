@@ -656,7 +656,7 @@ export default function AnimalEdit() {
         <div className="bg-white/80 backdrop-blur-md border border-stone-200/50 p-4 rounded-2xl shadow-2xl flex-1 flex items-center justify-between pointer-events-auto">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 bg-[#002819]/10 rounded-lg flex items-center justify-center">
-              <MaterialSymbol icon="history" className="text-[#002819]" style={{ fontVariationSettings: "'FILL' 1" }} />
+              <MaterialSymbol icon="history" className="text-[#002819] fill-current" />
             </div>
             <div>
               <p className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">{t('animals.unsavedChanges')}</p>

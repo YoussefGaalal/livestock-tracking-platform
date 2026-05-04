@@ -220,27 +220,27 @@ export default function ReportsPage() {
                 <span className="text-stone-700">Racing Camels (Elite)</span>
                 <span className="text-[#002819]">12.4 km</span>
               </div>
-              <div className="h-3 w-full bg-stone-100 rounded-full overflow-hidden">
-                <div className="h-full bg-[#002819] rounded-full" style={{ width: '85%' }}></div>
-              </div>
+                 <div className="h-3 w-full bg-[#f0f0ed] rounded-full overflow-hidden">
+                   <div className="h-full bg-[#002819] rounded-full w-[85%]"></div>
+                 </div>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm font-bold">
                 <span className="text-stone-700">Breeding Herd (North)</span>
                 <span className="text-[#002819]">7.8 km</span>
               </div>
-              <div className="h-3 w-full bg-stone-100 rounded-full overflow-hidden">
-                <div className="h-full bg-[#002819]/60 rounded-full" style={{ width: '55%' }}></div>
-              </div>
+                 <div className="h-3 w-full bg-[#f0f0ed] rounded-full overflow-hidden">
+                   <div className="h-full bg-[#002819]/60 rounded-full w-[55%]"></div>
+                 </div>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm font-bold">
                 <span className="text-stone-700">Grazing Sheep (West)</span>
                 <span className="text-[#002819]">5.2 km</span>
               </div>
-              <div className="h-3 w-full bg-stone-100 rounded-full overflow-hidden">
-                <div className="h-full bg-[#002819]/30 rounded-full" style={{ width: '38%' }}></div>
-              </div>
+                 <div className="h-3 w-full bg-[#f0f0ed] rounded-full overflow-hidden">
+                   <div className="h-full bg-[#002819]/30 rounded-full w-[38%]"></div>
+                 </div>
             </div>
           </div>
         </div>

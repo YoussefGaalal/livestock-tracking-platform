@@ -420,12 +420,11 @@ const fetchAnimal = async () => {
         </div>
         <div className="h-[450px] relative z-0">
           {positions.length > 0 ? (
-            <MapContainer 
-              center={currentPosition || [24.4539, 54.3773]} 
-              zoom={14} 
-              style={{ height: '100%', width: '100%' }}
-              className="z-0"
-            >
+             <MapContainer 
+               center={currentPosition || [24.4539, 54.3773]} 
+               zoom={14} 
+               className="z-0 h-full w-full"
+             >
               <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
               <MapUpdater center={currentPosition} zoom={14} />
               

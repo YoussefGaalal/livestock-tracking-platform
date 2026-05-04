@@ -779,7 +779,7 @@ export default function MapView() {
 
       {/* Map */}
       <div className="absolute top-0 left-0 right-0 bottom-0 pt-14">
-        <MapContainer center={mapCenter} zoom={10} style={{ height: '100%', width: '100%' }} className="z-0">
+         <MapContainer center={mapCenter} zoom={10} className="z-0 h-full w-full">
           <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           <MapUpdater bounds={bounds} zoomPosition={zoomPosition} center={mapCenter} />
           <GeofenceDrawer isDrawing={isDrawingGeofence} drawMode={drawMode} onComplete={handleGeofenceDrawComplete} drawingRectStart={drawingRectStart} onRectStartSet={setDrawingRectStart} />

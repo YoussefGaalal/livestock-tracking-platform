@@ -46,7 +46,7 @@ const DEMO_STATS = { totalAnimals: 8, activeDevices: 5, alerts: 3 };
 /* ─── Map helpers ───────────────────────────────────────────────────────── */
 const createCustomIcon = () => L.divIcon({
   className: 'custom-marker',
-  html: `<div style="width:28px;height:28px;background:linear-gradient(135deg,#002819,#06402B);border-radius:50%;border:2px solid #D4AF37;box-shadow:0 3px 8px rgba(6,64,43,0.35);display:flex;align-items:center;justify-content:center;font-size:13px;">🐪</div>`,
+  html: `<div class="w-7 h-7 bg-gradient-to-br from-[#002819] to-[#06402B] rounded-full border-2 border-[#D4AF37] shadow-[0_3px_8px_rgba(6,64,43,0.35)] flex items-center justify-center text-[13px]">🐪</div>`,
   iconSize: [28, 28], iconAnchor: [14, 14], popupAnchor: [0, -14],
 });
 
@@ -243,7 +243,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="h-[300px] md:h-[420px] relative">
-            <MapContainer center={[24.4539, 54.3773]} zoom={12} style={{ height:'100%', width:'100%' }} scrollWheelZoom={false}>
+            <MapContainer center={[24.4539, 54.3773]} zoom={12} className="h-full w-full" scrollWheelZoom={false}>
               <TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
               <MapUpdater bounds={bounds} />
               {viewMode === 'markers' && animals.filter(a => a.lat && a.lng).map((a, i) => (
@@ -283,7 +283,7 @@ export default function Dashboard() {
               View all <MaterialSymbol icon="chevron_right" size={14} />
             </Link>
           </div>
-          <div className="flex-1 overflow-y-auto px-3 md:px-4 py-3 md:py-4 space-y-3" style={{ maxHeight: 380 }}>
+           <div className="flex-1 overflow-y-auto px-3 md:px-4 py-3 md:py-4 space-y-3 max-h-[380px]">
             {alerts.map((alert, i) => {
               const s = SEVERITY_STYLES[alert.severity] || SEVERITY_STYLES.Low;
               return (
