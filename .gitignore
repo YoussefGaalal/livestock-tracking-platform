@@ -56,8 +56,8 @@ Backend_Deep_Analysis.html
 # ----- Local generation/helper scripts (not part of the project) -----------
 generate-report.js
 generate-report.bat
-package.json
-package-lock.json
+/package.json
+/package-lock.json
 
 # ----- Root-level docs (internal only) ----------------------
 DEPLOYMENT_GUIDE.md

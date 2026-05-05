@@ -6,7 +6,7 @@ import { useI18n } from '../i18n.jsx';
 import { usePlatform } from '../context/PlatformContext';
 
 export default function Login() {
-  const { t, dir } = useI18n();
+  const { t, dir, language, changeLanguage } = useI18n();
   const { platformName } = usePlatform();
   const isRtl = dir === 'rtl';
 
