@@ -389,8 +389,14 @@ const resources = {
         twilio: 'Twilio',
         notifications: 'Notifications',
         language: 'Language',
+        roles: 'Roles',
+        roleManagement: 'Role Management',
+        roleManagementDesc: 'Manage user roles and permissions',
+        permissions: 'Permissions',
+        permissionsDesc: 'View all available permissions',
         exportDatabase: 'Export Database',
         addNewEntry: 'Add New Entry',
+        fetchError: 'Failed to fetch data',
       },
       // Profile
       profile: {
@@ -839,8 +845,14 @@ const resources = {
         twilio: 'Twilio',
         notifications: 'الإشعارات',
         language: 'اللغة',
+        roles: 'الأدوار',
+        roleManagement: 'إدارة الأدوار',
+        roleManagementDesc: 'إدارة أدوار المستخدمين والصلاحيات',
+        permissions: 'الصلاحيات',
+        permissionsDesc: 'عرض جميع الصلاحيات المتاحة',
         exportDatabase: 'تصدير قاعدة البيانات',
         addNewEntry: 'إضافة مدخل جديد',
+        fetchError: 'فشل في جلب البيانات',
       },
       // Profile
       profile: {

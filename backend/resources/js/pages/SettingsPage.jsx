@@ -4,12 +4,17 @@ import { apiFetch } from '../utils/api';
 import { exportDatabase } from '../utils/export';
 import { useI18n } from '../i18n';
 import { usePlatform } from '../context/PlatformContext';
+import { useAuth } from '../context/AuthContext';
 import TranslationManagement from './Settings/TranslationManagement';
+import RoleManagement from './Settings/RoleManagement';
 
 export default function SettingsPage() {
   const { t, dir } = useI18n();
   const { refreshPlatformName } = usePlatform();
+  const { user } = useAuth();
   const isRtl = dir === 'rtl';
+  // Check if user has Admin role via Spatie roles array (returns array of strings)
+  const isAdmin = user?.roles?.includes('Admin') || user?.role === 'Admin';
   const [activeTab, setActiveTab] = useState('general');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -287,6 +292,7 @@ export default function SettingsPage() {
     { id: 'gemini', label: t('settings.gemini'), icon: 'psychology' },
     { id: 'whatsapp', label: t('settings.whatsapp'), icon: 'chat' },
     { id: 'twilio', label: t('settings.twilio'), icon: 'sms' },
+    { id: 'roles', label: t('settings.roles'), icon: 'admin_panel_settings' },
     { id: 'translations', label: t('settings.language'), icon: 'translate' },
   ];
 
