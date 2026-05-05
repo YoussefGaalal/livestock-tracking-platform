@@ -5,6 +5,15 @@ export const setStoredLocale = (locale) => {
   if (typeof localStorage !== 'undefined') {
     localStorage.setItem('oasis_locale', locale);
   }
+  // Sync with backend
+  const token = localStorage.getItem('oasis_token');
+  if (token) {
+    fetch('/api/auth/locale', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ locale: locale })
+    }).catch(() => {});
+  }
 };
 
 export const getAuthHeaders = () => {
