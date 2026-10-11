@@ -1,5 +1,7 @@
 # Livestock Tracking Platform
 
+[![CI](https://github.com/YoussefGaalal/livestock-tracking-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/YoussefGaalal/livestock-tracking-platform/actions/workflows/ci.yml)
+
 A multi-tenant livestock management platform: GPS-tracked herds on a live map, geofence alerts, health and vaccination records, team roles, and a built-in auction marketplace — in English, Arabic, Urdu and Basque, with full right-to-left support.
 
 Built with **Laravel 11** (REST API) and **React 18** (single-page app), backed by **MySQL 8**.
