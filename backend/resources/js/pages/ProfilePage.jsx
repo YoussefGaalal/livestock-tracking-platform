@@ -100,7 +100,7 @@ export default function ProfilePage() {
         const data = await res.json();
         setMsg({ ok: false, text: data.message || 'Failed to update profile' });
       }
-    } catch (err) {
+    } catch {
       setMsg({ ok: false, text: 'Network error' });
     } finally {
       setSaving(false);
@@ -123,7 +123,7 @@ export default function ProfilePage() {
         const data = await res.json();
         setMsg({ ok: false, text: data.message || 'Failed to update subscription' });
       }
-    } catch (err) {
+    } catch {
       setMsg({ ok: false, text: 'Network error' });
     } finally {
       setSaving(false);

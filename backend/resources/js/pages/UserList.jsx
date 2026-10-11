@@ -88,7 +88,7 @@ export default function UserList() {
         fetchData(); 
         setTimeout(() => setMessage(null), 3000); 
       }
-    } catch (error) { 
+    } catch { 
       setMessage({ type: 'error', text: 'Failed to delete' }); 
     }
   };

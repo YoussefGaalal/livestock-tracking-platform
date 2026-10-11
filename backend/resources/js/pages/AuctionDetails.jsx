@@ -63,7 +63,7 @@ export default function AuctionDetails() {
       } else {
         setMessage({ type: 'error', text: data.message || 'Failed to place bid' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to place bid' });
     } finally {
       setPlacing(false);
@@ -86,7 +86,7 @@ export default function AuctionDetails() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || 'Failed to end auction' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to end auction' });
     } finally {
       setEndingAuction(false);
@@ -114,7 +114,7 @@ export default function AuctionDetails() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || 'Failed to upload payment proof' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to upload payment proof' });
     } finally {
       setUploadingProof(false);
@@ -137,7 +137,7 @@ export default function AuctionDetails() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || 'Failed to verify payment' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to verify payment' });
     }
   };
@@ -157,7 +157,7 @@ export default function AuctionDetails() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || 'Failed to disqualify bidder' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to disqualify bidder' });
     }
   };

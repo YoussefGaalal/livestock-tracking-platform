@@ -92,7 +92,7 @@ export default function AnimalDetails() {
         const data = await res.json();
         setMessage({ type: 'error', text: data.message || 'Transfer failed' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Network error' });
     } finally {
       setTransferLoading(false);

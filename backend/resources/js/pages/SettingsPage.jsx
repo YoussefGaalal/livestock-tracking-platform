@@ -6,7 +6,6 @@ import { useI18n } from '../i18n';
 import { usePlatform } from '../context/PlatformContext';
 import { useAuth } from '../context/AuthContext';
 import TranslationManagement from './Settings/TranslationManagement';
-import RoleManagement from './Settings/RoleManagement';
 
 export default function SettingsPage() {
   const { t, dir } = useI18n();
@@ -149,7 +148,7 @@ export default function SettingsPage() {
         const data = await res.json();
         setMessage({ type: 'error', text: data.message || 'Failed to save' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Network error' });
     } finally {
       setSaving(false);
@@ -171,7 +170,7 @@ export default function SettingsPage() {
         const data = await res.json();
         setMessage({ type: 'error', text: data.message || 'Failed to save' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Network error' });
     } finally {
       setSaving(false);
@@ -189,7 +188,7 @@ export default function SettingsPage() {
       } else {
         setMessage({ type: 'error', text: data.message });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Network error' });
     } finally {
       setTesting(false);
@@ -211,7 +210,7 @@ export default function SettingsPage() {
         const data = await res.json();
         setMessage({ type: 'error', text: data.message || 'Failed to save' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Network error' });
     } finally {
       setSaving(false);
@@ -233,7 +232,7 @@ export default function SettingsPage() {
         const data = await res.json();
         setMessage({ type: 'error', text: data.message || 'Failed to save' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Network error' });
     } finally {
       setSaving(false);
@@ -255,7 +254,7 @@ export default function SettingsPage() {
         const data = await res.json();
         setMessage({ type: 'error', text: data.message || 'Failed to save' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Network error' });
     } finally {
       setSaving(false);
@@ -277,7 +276,7 @@ export default function SettingsPage() {
         const data = await res.json();
         setMessage({ type: 'error', text: data.message || 'Failed to save' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Network error' });
     } finally {
       setSaving(false);

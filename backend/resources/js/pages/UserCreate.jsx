@@ -52,7 +52,7 @@ export default function UserCreate() {
       } else {
         setMsg({ ok: false, text: data.message || t('users.userCreateFailed') });
       }
-    } catch (err) {
+    } catch {
       setMsg({ ok: false, text: t('errors.networkError') });
     } finally {
       setSaving(false);

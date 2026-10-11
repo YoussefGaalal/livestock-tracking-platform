@@ -87,7 +87,7 @@ export default function TeamPage() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || t('teamPage.failedAdd') });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: t('teamPage.failedAdd') });
     } finally {
       setActionLoading(false);
@@ -114,7 +114,7 @@ export default function TeamPage() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || t('teamPage.failedAssign') });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: t('teamPage.failedAssign') });
     } finally {
       setActionLoading(false);
@@ -135,7 +135,7 @@ export default function TeamPage() {
         setMessage({ type: 'success', text: t('teamPage.removedSuccess') });
         fetchData();
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: t('teamPage.failedRemove') });
     }
   };

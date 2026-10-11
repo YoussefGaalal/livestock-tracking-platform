@@ -179,7 +179,7 @@ export default function TasksPage() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || 'Failed to create task' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Network error' });
     } finally {
       setSaving(false);
@@ -221,7 +221,7 @@ export default function TasksPage() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || 'Failed to submit log' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Network error' });
     } finally {
       setSaving(false);

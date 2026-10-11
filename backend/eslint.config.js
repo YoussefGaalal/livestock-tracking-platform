@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import globals from 'globals';
 
 export default [
   js.configs.recommended,
@@ -8,21 +9,7 @@ export default [
       ecmaVersion: 2022,
       sourceType: 'module',
       globals: {
-        console: 'readonly',
-        localStorage: 'readonly',
-        document: 'readonly',
-        fetch: 'readonly',
-        setTimeout: 'readonly',
-        setInterval: 'readonly',
-        clearInterval: 'readonly',
-        window: 'readonly',
-        alert: 'readonly',
-        confirm: 'readonly',
-        File: 'readonly',
-        FileReader: 'readonly',
-        FormData: 'readonly',
-        navigator: 'readonly',
-        URL: 'readonly'
+        ...globals.browser,
       },
       parserOptions: {
         ecmaFeatures: {

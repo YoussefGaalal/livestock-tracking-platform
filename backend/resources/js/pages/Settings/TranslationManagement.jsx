@@ -73,7 +73,7 @@ export default function TranslationManagement() {
           setMessage({ type: 'success', text: t('common.save') + ' ' + t('common.success').toLowerCase() });
         }
       }
-    } catch (err) {
+    } catch {
       setMessage({ type: 'error', text: t('errors.serverError') });
     } finally {
       setSaving(false);

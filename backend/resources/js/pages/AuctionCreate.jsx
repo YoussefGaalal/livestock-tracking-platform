@@ -84,7 +84,7 @@ export default function AuctionCreate() {
       } else {
         setMessage({ type: 'error', text: data.message || 'Failed to create auction' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to create auction' });
     } finally {
       setSubmitting(false);

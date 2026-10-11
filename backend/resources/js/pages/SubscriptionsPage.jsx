@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { MaterialSymbol } from 'react-material-symbols';
 import { apiFetch } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
@@ -86,7 +85,7 @@ export default function SubscriptionsPage() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || 'Failed to subscribe' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to subscribe' });
     } finally {
       setActionLoading(null);
@@ -111,7 +110,7 @@ export default function SubscriptionsPage() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || 'Failed to upgrade' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to upgrade' });
     } finally {
       setActionLoading(null);
@@ -136,7 +135,7 @@ export default function SubscriptionsPage() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || 'Failed to downgrade' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to downgrade' });
     } finally {
       setActionLoading(null);
@@ -161,7 +160,7 @@ export default function SubscriptionsPage() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || 'Failed to cancel' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to cancel subscription' });
     } finally {
       setActionLoading(null);
@@ -183,7 +182,7 @@ export default function SubscriptionsPage() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || 'Failed to update tier' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to update tier' });
     }
   };
@@ -203,7 +202,7 @@ export default function SubscriptionsPage() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || 'Failed to delete tier' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to delete tier' });
     }
   };
@@ -252,7 +251,7 @@ export default function SubscriptionsPage() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || 'Failed to save tier' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to save tier' });
     }
   };

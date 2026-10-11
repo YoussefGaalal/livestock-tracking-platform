@@ -83,7 +83,7 @@ export default function AuctionList() {
       } else {
         setMessage({ type: 'error', text: data.message || t('auctionsPage.bidFailed') });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: t('auctionsPage.bidFailed') });
     } finally {
       setPlacing(false);

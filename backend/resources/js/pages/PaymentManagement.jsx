@@ -67,7 +67,7 @@ export default function PaymentManagement() {
         const data = await response.json();
         alert(data.message || 'Failed to process payment');
       }
-    } catch (error) {
+    } catch {
       alert('Network error');
     } finally {
       setProcessing(false);
