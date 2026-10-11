@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { MaterialSymbol } from 'react-material-symbols';
 import { apiFetch } from '../utils/api';
 import { useI18n } from '../i18n';
+import { useAuth } from '../context/AuthContext';
 
 export default function DeviceForm() {
   const navigate = useNavigate();
@@ -95,7 +96,7 @@ export default function DeviceForm() {
       } else {
         setMessage({ type: 'error', text: data.message || 'Failed to register device' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Network error. Please try again.' });
     } finally {
       setIsSubmitting(false);

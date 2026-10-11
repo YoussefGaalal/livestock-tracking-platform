@@ -199,7 +199,7 @@ export default function AnimalList() {
         fetchData();
         setTimeout(() => { setShowAssignModal(false); setMessage(null); }, 1500);
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: t('common.error') });
     } finally {
       setAssigning(false);
@@ -360,7 +360,7 @@ return (
                             <img src={animal.identification_photo} alt={animal.animal_id} className="w-full h-full object-cover" />
                           ) : (
                             <span className="text-2xl">
-                              {animal.species === 'Camel' ? '🐪' : animal.species === 'Goat' ? '🐐' : animal.species === 'Sheep' ? '🐑' : animal.species === 'Cow' ? '🐄' : animal.species === 'Dog' ? '🐕' : '🐪'}
+                              {animal.species === 'Camel' ? '🐪' : animal.species === 'Goat' ? '🐐' : animal.species === 'Sheep' ? '🐑' : animal.species === 'Cattle' ? '🐄' : animal.species === 'Horse' ? '🐎' : animal.species === 'Donkey' ? '🫏' : '🐪'}
                             </span>
                           )}
                         </div>

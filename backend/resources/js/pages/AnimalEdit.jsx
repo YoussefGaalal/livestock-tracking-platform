@@ -19,7 +19,7 @@ export default function AnimalEdit() {
     breed: '',
     custom_breed: '',
     date_of_birth: '',
-    gender: 'Male',
+    gender: 'male',
     color_markings: '',
     current_weight: '',
     baseline_temperature: '',
@@ -29,26 +29,28 @@ export default function AnimalEdit() {
   });
 
   const breedOptions = {
-    Camel: ['Majaheem', 'Wadhah', 'Suhail', 'Maqatir', 'Shalal', 'Bishah', 'Hawi', 'Other'],
-    Goat: ['Boer', 'Nubian', 'Saanen', 'Alpine', 'Kiko', 'Spanish', 'Other'],
+    Camel: ['Dromedary', 'Racing Dromedary', 'Majaheem', 'Wadhah', 'Suhail', 'Maqatir', 'Shalal', 'Bishah', 'Hawi', 'Other'],
+    Goat: ['Damascus', 'Arabian Goat', 'Boer', 'Nubian', 'Saanen', 'Alpine', 'Kiko', 'Spanish', 'Other'],
     Sheep: ['Awassi', 'Najdi', 'Hejazi', 'Rashidi', 'Muwassit', 'Other'],
-    Cow: ['Holstein', 'Jersey', 'Angus', 'Hereford', 'Brahman', 'Other'],
-    Dog: ['Saluki', 'Hound', 'Shepherd', 'Retriever', 'Terrier', 'Other'],
+    Horse: ['Arabian', 'Thoroughbred', 'Akhal-Teke', 'Other'],
+    Cattle: ['Holstein', 'Jersey', 'Friesian', 'Angus', 'Hereford', 'Brahman', 'Other'],
+    Donkey: ['Arabian Donkey', 'Hassawi', 'Other'],
   };
 
-  const getBreedOptions = () => {
-    const speciesObj = speciesList.find(s => s.name === formData.species);
-    if (speciesObj && speciesObj.breeds) {
-      return speciesObj.breeds.map(b => b.name);
-    }
-    return breedOptions[formData.species] || ['Other'];
+  // Breeds come from the species API when available; "Other" is always offered for custom entries
+  const breedsFor = (species, rows = speciesList) => {
+    const speciesObj = rows.find(s => s.name === species);
+    const names = speciesObj?.breeds?.length ? speciesObj.breeds.map(b => b.name) : (breedOptions[species] || []);
+    return [...names.filter(n => n !== 'Other'), 'Other'];
   };
+
+  const getBreedOptions = () => breedsFor(formData.species);
 
   const getSpeciesOptions = () => {
     if (speciesList.length > 0) {
       return speciesList.map(s => s.name);
     }
-    return ['Camel', 'Goat', 'Sheep', 'Cow', 'Dog'];
+    return ['Camel', 'Goat', 'Sheep', 'Horse', 'Cattle', 'Donkey'];
   };
   const [imagePreview, setImagePreview] = useState(null);
   const [existingImage, setExistingImage] = useState(null);
@@ -93,7 +95,7 @@ export default function AnimalEdit() {
       const ownersList = users.filter(u => u.role === 'Owner');
       setOwners(ownersList);
 
-      const currentDeviceId = currentAnimal?.device_id;
+      const currentDeviceId = currentAnimal?.device?.device_id;
       const currentDevice = currentDeviceId ? devices.find(d => d.device_id === currentDeviceId) : null;
       
       if (currentDevice) {
@@ -101,8 +103,8 @@ export default function AnimalEdit() {
       }
 
       const assignedDeviceIds = animals
-        .filter(a => a.device_id && a.id !== parseInt(id || 0))
-        .map(a => a.device_id);
+        .filter(a => a.device?.device_id && a.id !== parseInt(id || 0))
+        .map(a => a.device.device_id);
 
       const available = devices.filter(d => 
         !assignedDeviceIds.includes(d.device_id)
@@ -116,11 +118,10 @@ export default function AnimalEdit() {
 
       if (!isNewAnimal && currentAnimal) {
         const species = currentAnimal.species || 'Camel';
-        const allSpeciesOptions = ['Camel', 'Goat', 'Sheep', 'Cow', 'Dog'];
+        const allSpeciesOptions = ['Camel', 'Goat', 'Sheep', 'Horse', 'Cattle', 'Donkey'];
         const isPredefinedSpecies = allSpeciesOptions.includes(species);
         const breed = currentAnimal.breed || '';
-        const allBreeds = breedOptions[species] || [];
-        const isPredefinedBreed = allBreeds.includes(breed);
+        const isPredefinedBreed = breed !== '' && breedsFor(species, speciesData.data || []).includes(breed);
         
         setFormData({
           name: currentAnimal.name || '',
@@ -129,12 +130,12 @@ export default function AnimalEdit() {
           breed: isPredefinedBreed ? breed : 'Other',
           custom_breed: isPredefinedBreed ? '' : breed,
           date_of_birth: currentAnimal.date_of_birth || '',
-          gender: currentAnimal.gender || 'Male',
+          gender: (currentAnimal.gender || 'male').toLowerCase(),
           color_markings: currentAnimal.color_markings || '',
           current_weight: currentAnimal.current_weight || '',
           baseline_temperature: currentAnimal.baseline_temperature || '',
           normal_heart_rate: currentAnimal.normal_heart_rate || '',
-          device_id: currentAnimal.device_id || '',
+          device_id: currentAnimal.device?.device_id || '',
           owner_id: currentAnimal.owner_id || '',
         });
         if (currentAnimal.identification_photo) {
@@ -258,7 +259,7 @@ export default function AnimalEdit() {
     try {
       const response = await apiFetch(`/api/animals/${id}`, { method: 'DELETE' });
       if (response.ok) navigate('/animals');
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to delete animal' });
     }
   };
@@ -381,8 +382,8 @@ export default function AnimalEdit() {
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-bold text-stone-500 uppercase tracking-widest px-1">{t('animals.gender')}</label>
                   <select name="gender" value={formData.gender} onChange={handleChange} className="w-full bg-[#f4f4ef] border-none rounded-xl px-4 py-3 text-emerald-900 font-semibold focus:ring-2 focus:ring-[#06402b]/10">
-                    <option value="Male">{t('common.male')}</option>
-                    <option value="Female">{t('common.female')}</option>
+                    <option value="male">{t('common.male')}</option>
+                    <option value="female">{t('common.female')}</option>
                   </select>
                 </div>
                 <div className="space-y-1.5">

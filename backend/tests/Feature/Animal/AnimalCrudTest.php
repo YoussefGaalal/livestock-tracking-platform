@@ -15,11 +15,6 @@ class AnimalCrudTest extends TestCase
         parent::setUp();
         $this->user = $this->createUser(['email' => 'owner@example.com']);
         $this->otherUser = $this->createUser(['email' => 'other@example.com']);
-        $this->user->givePermissionTo([
-            'manage_animals', 'manage_devices', 'manage_users', 
-            'manage_geofences', 'manage_auctions'
-        ]);
-        $this->otherUser->givePermissionTo(['manage_animals']);
         $this->authAs($this->user);
     }
 
@@ -137,5 +132,32 @@ class AnimalCrudTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['gender']);
+    }
+
+    public function test_creating_an_animal_links_the_selected_tracker(): void
+    {
+        $device = $this->createDevice(['owner_id' => $this->user->id, 'device_id' => 'DEV-777']);
+
+        $response = $this->postJson('/api/animals', [
+            'name' => 'Tracked Camel',
+            'species' => 'Camel',
+            'gender' => 'male',
+            'device_id' => 'DEV-777',
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertSame($response->json('data.id'), $device->fresh()->animal_id);
+    }
+
+    public function test_updating_an_animal_reassigns_its_tracker(): void
+    {
+        $animal = $this->createAnimal(['owner_id' => $this->user->id]);
+        $device = $this->createDevice(['owner_id' => $this->user->id, 'device_id' => 'DEV-778']);
+
+        $this->putJson("/api/animals/{$animal->id}", ['device_id' => 'DEV-778'])->assertStatus(200);
+        $this->assertSame($animal->id, $device->fresh()->animal_id);
+
+        $this->putJson("/api/animals/{$animal->id}", ['device_id' => ''])->assertStatus(200);
+        $this->assertNull($device->fresh()->animal_id);
     }
 }

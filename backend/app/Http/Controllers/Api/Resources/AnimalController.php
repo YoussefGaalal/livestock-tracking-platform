@@ -33,7 +33,7 @@ class AnimalController extends Controller
         $authUser = $request->user();
         
         if ($authUser) {
-            if (!$authUser->hasPermissionTo('manage_animals')) {
+            if (!$authUser->hasPermissionTo('animal_create')) {
                 return response()->json(['message' => 'Unauthorized to create animals', 'error' => 'unauthorized'], 403);
             }
         } else {
@@ -47,7 +47,7 @@ class AnimalController extends Controller
         $data = $request->validated();
         
         if (!empty($data['device_id'])) {
-            $device = Device::find($data['device_id']);
+            $device = $this->resolveDevice($data['device_id']);
             if ($device && $device->animal_id) {
                 return response()->json([
                     'message' => 'This device is already assigned to another animal',
@@ -90,7 +90,13 @@ class AnimalController extends Controller
             $data['identification_photo'] = '/storage/' . $filename;
         }
         
+        $device = !empty($data['device_id']) ? $this->resolveDevice($data['device_id']) : null;
+        unset($data['device_id']);
+
         $animal = Animal::create($data);
+
+        // The device side owns the link (devices.animal_id)
+        $device?->update(['animal_id' => $animal->id]);
         $animal->load(['owner', 'device']);
 
         return response()->json([
@@ -113,7 +119,7 @@ class AnimalController extends Controller
     {
         $authUser = $request->user();
         
-        if ($authUser && !$authUser->hasPermissionTo('manage_animals')) {
+        if ($authUser && !$authUser->hasPermissionTo('animal_edit')) {
             return response()->json(['message' => 'Unauthorized to modify animal', 'error' => 'unauthorized'], 403);
         }
         
@@ -123,9 +129,10 @@ class AnimalController extends Controller
         
         $data = $request->validated();
         
-        if (isset($data['device_id'])) {
+        // array_key_exists, not isset: an empty selection arrives as null and means "unassign"
+        if (array_key_exists('device_id', $data)) {
             if ($data['device_id']) {
-                $device = Device::find($data['device_id']);
+                $device = $this->resolveDevice($data['device_id']);
                 if ($device && $device->animal_id && $device->animal_id !== $animal->id) {
                     return response()->json([
                         'message' => 'This device is already assigned to another animal',
@@ -177,7 +184,7 @@ class AnimalController extends Controller
     {
         $authUser = $request->user();
         
-        if ($authUser && !$authUser->hasPermissionTo('manage_animals')) {
+        if ($authUser && !$authUser->hasPermissionTo('animal_delete')) {
             return response()->json(['message' => 'Unauthorized to delete animal', 'error' => 'unauthorized'], 403);
         }
         
@@ -222,5 +229,13 @@ class AnimalController extends Controller
             'message' => 'Animal ownership transferred successfully',
             'data' => new AnimalResource($animal),
         ]);
+    }
+
+    /**
+     * Forms send the device code (e.g. DEV-001); older clients send the numeric id.
+     */
+    private function resolveDevice(string|int $value): ?Device
+    {
+        return Device::where('device_id', $value)->orWhere('id', $value)->first();
     }
 }

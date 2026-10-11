@@ -11,14 +11,24 @@ class UpdateAnimalRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Gender is stored lowercase; accept "Male"/"Female" from older clients.
+     */
+    protected function prepareForValidation(): void
+    {
+        if (is_string($this->input('gender'))) {
+            $this->merge(['gender' => strtolower($this->input('gender'))]);
+        }
+    }
+
     public function rules(): array
     {
         return [
             'name' => 'nullable|string|max:255',
-            'species' => 'sometimes|in:Camel,Goat,Sheep,Cow,Dog',
+            'species' => 'sometimes|in:Camel,Goat,Sheep,Horse,Cattle,Donkey',
             'breed' => 'nullable|string|max:255',
             'date_of_birth' => 'nullable|date',
-            'gender' => 'sometimes|in:Male,Female',
+            'gender' => 'sometimes|in:male,female',
             'color_markings' => 'nullable|string',
             'current_weight' => 'nullable|numeric|min:0',
             'identification_photo' => 'nullable|file|image|max:10240',

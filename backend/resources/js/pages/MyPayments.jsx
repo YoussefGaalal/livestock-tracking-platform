@@ -154,12 +154,12 @@ export default function MyPayments() {
       
       if (response.ok) {
         setMessage({ type: 'success', text: 'Payment proof uploaded successfully!' });
-        fetchWonAuctions();
+        fetchData();
       } else {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || 'Failed to upload payment proof' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to upload payment proof' });
     } finally {
       setUploadingProof(null);
@@ -201,11 +201,11 @@ export default function MyPayments() {
       if (response.ok) {
         setMessage({ type: 'success', text: 'Payment successful! Animal ownership transferred.' });
         setShowCardModal(false);
-        fetchWonAuctions();
+        fetchData();
       } else {
         setCardError(data.message || 'Payment failed');
       }
-    } catch (error) {
+    } catch {
       setCardError('Payment failed. Please try again.');
     } finally {
       setProcessingCard(null);

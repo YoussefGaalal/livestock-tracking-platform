@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { MaterialSymbol } from 'react-material-symbols';
 import { apiFetch } from '../utils/api';
 import { useI18n } from '../i18n';
+import { useAuth } from '../context/AuthContext';
 
 export default function UserEdit() {
   const { id } = useParams();
@@ -114,7 +115,7 @@ export default function UserEdit() {
       } else {
         setMsg({ ok: false, text: response.message || 'Failed to update user' });
       }
-    } catch (err) {
+    } catch {
       setMsg({ ok: false, text: 'Network error' });
     } finally {
       setSaving(false);

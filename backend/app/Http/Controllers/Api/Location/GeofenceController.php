@@ -71,7 +71,7 @@ class GeofenceController extends Controller
     {
         $authUser = $request->user();
         
-        if ($authUser && !$authUser->hasPermissionTo('manage_geofences')) {
+        if ($authUser && !$authUser->hasPermissionTo('geofence_create')) {
             return response()->json(['message' => 'Unauthorized to create geofences', 'error' => 'unauthorized'], 403);
         }
         
@@ -124,7 +124,7 @@ class GeofenceController extends Controller
     {
         $authUser = $request->user();
         
-        if ($authUser && !$authUser->hasPermissionTo('manage_geofences')) {
+        if ($authUser && !$authUser->hasPermissionTo('geofence_edit')) {
             return response()->json(['message' => 'Unauthorized to modify geofence', 'error' => 'unauthorized'], 403);
         }
         
@@ -156,7 +156,7 @@ class GeofenceController extends Controller
     {
         $authUser = $request->user();
         
-        if ($authUser && !$authUser->hasPermissionTo('manage_geofences')) {
+        if ($authUser && !$authUser->hasPermissionTo('geofence_delete')) {
             return response()->json(['message' => 'Unauthorized to delete geofence', 'error' => 'unauthorized'], 403);
         }
         

@@ -104,16 +104,17 @@ export default function Dashboard() {
 
       // Use live data if we actually received animals, otherwise keep demo
       if (liveAnimals.length > 0) {
-        const withCoords = liveAnimals.map((a, i) => ({
+        // Positions come from each animal's GPS tracker; untracked animals get no marker
+        const withCoords = liveAnimals.map((a) => ({
           ...a,
-          lat: a.lat ?? (24.4539 + i * 0.002),
-          lng: a.lng ?? (54.3773 + i * 0.003),
+          lat: a.device?.gps_lat != null ? Number(a.device.gps_lat) : null,
+          lng: a.device?.gps_lng != null ? Number(a.device.gps_lng) : null,
           path: [],
         }));
         setAnimals(withCoords);
         setStats({
           totalAnimals: animData?.meta?.total ?? liveAnimals.length,
-          activeDevices: liveAnimals.filter(a => a.device_id).length,
+          activeDevices: liveAnimals.filter(a => a.device).length,
           alerts: liveAlerts.filter(a => !a.is_acknowledged).length,
         });
       }

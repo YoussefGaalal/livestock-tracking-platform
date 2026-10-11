@@ -102,7 +102,7 @@ class TaskController extends Controller
     {
         $authUser = $request->user();
         
-        if ($authUser && !$authUser->hasPermissionTo('manage_tasks')) {
+        if ($authUser && !$authUser->hasPermissionTo('task_create')) {
             return response()->json(['message' => 'Unauthorized to create tasks', 'error' => 'unauthorized'], 403);
         }
         
@@ -232,7 +232,7 @@ class TaskController extends Controller
     {
         $authUser = $request->user();
         
-        if ($authUser && !$authUser->hasPermissionTo('manage_tasks')) {
+        if ($authUser && !$authUser->hasPermissionTo('task_delete')) {
             return response()->json(['message' => 'Unauthorized', 'error' => 'unauthorized'], 403);
         }
         
