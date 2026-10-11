@@ -51,8 +51,13 @@ class LocationHistoryController extends Controller
             'recorded_at' => 'nullable|date',
         ]);
 
-        $device = Device::findOrFail($validated['device_id']);
-        
+        // Authenticated by AuthenticateDevice — a tracker may only report its own position
+        $device = $request->attributes->get('device');
+
+        if ($device->id != $validated['device_id']) {
+            return response()->json(['message' => 'Token does not belong to this device', 'error' => 'device_mismatch'], 403);
+        }
+
         if (!$device->animal_id) {
             return response()->json(['message' => 'No animal assigned to this device'], 404);
         }

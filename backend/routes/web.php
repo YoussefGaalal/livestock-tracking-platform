@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', function () {
-    return ['Laravel' => app()->version()];
+    return ['status' => 'ok'];
 });
 
 // Catch-all: serves the React SPA for any non-API, non-storage path.

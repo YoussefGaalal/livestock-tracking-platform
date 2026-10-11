@@ -112,6 +112,11 @@ class User extends Authenticatable
         return $this->getRoleNames()->first() ?? 'Owner';
     }
 
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('Admin');
+    }
+
     public function isOverUserLimit(): bool
     {
         $tier = $this->subscriptionTier;

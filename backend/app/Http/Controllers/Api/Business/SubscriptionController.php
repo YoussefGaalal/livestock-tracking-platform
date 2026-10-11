@@ -408,11 +408,10 @@ class SubscriptionController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
 
+        // Raw card data is never accepted by the API (PCI DSS). This checkout is a
+        // Stripe test-mode demo; production card capture belongs in Stripe Checkout/Elements.
         $validated = $request->validate([
             'tier_id' => 'required|exists:subscription_tiers,id',
-            'card_number' => 'required|string',
-            'expiry' => 'required|string',
-            'cvc' => 'required|string',
         ]);
 
         $tier = SubscriptionTier::find($validated['tier_id']);
@@ -422,8 +421,16 @@ class SubscriptionController extends Controller
             return response()->json(['message' => 'Free subscription activated']);
         }
 
+        $stripeSecret = (string) \App\Services\PaymentGateway::stripeSecret();
+        if (!str_starts_with($stripeSecret, 'sk_test_')) {
+            return response()->json([
+                'message' => 'Card checkout is only available in Stripe test mode. Use bank transfer instead.',
+                'error' => 'card_checkout_unavailable',
+            ], 400);
+        }
+
         try {
-            Stripe::setApiKey(config('services.stripe.secret'));
+            Stripe::setApiKey($stripeSecret);
 
             $charge = Charge::create([
                 'amount' => (float)$tier->price_monthly * 100,

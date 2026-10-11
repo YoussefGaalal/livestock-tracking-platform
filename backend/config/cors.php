@@ -21,19 +21,16 @@ return [
 
     // NOTE: '*' cannot be used together with supports_credentials: true (browsers reject it).
     // List explicit origins. For local Flutter dev, any localhost port is allowed via the pattern below.
-    'allowed_origins' => [
-        'https://oasis-trace-production.up.railway.app',
-        'http://localhost:3000',
-        'http://localhost:5173',
-        'http://localhost:8080',
-        'http://127.0.0.1:8080',
-    ],
+    // Comma-separated list, e.g. CORS_ALLOWED_ORIGINS=https://app.example.com
+    'allowed_origins' => array_values(array_filter(array_map('trim', explode(',', env(
+        'CORS_ALLOWED_ORIGINS',
+        'https://oasis-trace-production.up.railway.app'
+    ))))),
 
-    'allowed_origins_patterns' => [
-        // Allow any localhost port — covers Flutter debug builds on any emulator/device port
-        '#^http://localhost:\d+$#',
-        '#^http://127\.0\.0\.1:\d+$#',
-    ],
+    // Any localhost port is allowed only while developing locally
+    'allowed_origins_patterns' => env('APP_ENV') === 'local'
+        ? ['#^http://(localhost|127\.0\.0\.1):\d+$#']
+        : [],
 
     'allowed_headers' => ['*'],
 

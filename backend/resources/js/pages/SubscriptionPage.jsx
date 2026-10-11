@@ -99,7 +99,7 @@ export default function SubscriptionPage() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || 'Failed to upload' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Network error' });
     } finally {
       setUploading(false);
@@ -119,12 +119,10 @@ export default function SubscriptionPage() {
       const response = await apiFetch('/api/subscription/process-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // Card details stay in the browser — the API never receives raw card data
         body: JSON.stringify({
           tier_id: selectedTier.id,
           payment_method: 'card',
-          card_number: cardNumber,
-          expiry: expiry,
-          cvc: cvc,
         }),
       });
       
@@ -140,7 +138,7 @@ export default function SubscriptionPage() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || 'Payment failed' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Network error' });
     } finally {
       setProcessing(false);
@@ -162,7 +160,7 @@ export default function SubscriptionPage() {
         const data = await response.json();
         setMessage({ type: 'error', text: data.message || 'Failed to activate subscription' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Network error' });
     }
   };

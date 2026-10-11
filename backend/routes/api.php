@@ -25,20 +25,26 @@ use App\Http\Controllers\Api\Ai\AIController;
 use App\Http\Controllers\Api\Admin\LanguageController;
 use App\Http\Controllers\Api\Users\RoleManagementController;
 use App\Http\Controllers\Api\Resources\SpeciesController;
+use App\Http\Middleware\AuthenticateDevice;
 
 // fix-roles route removed — was a public destructive route, migration handled via proper DB migration
 
-Route::post('/auth/login', [AuthController::class, 'login'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/auth/register', [AuthController::class, 'register']);
-Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
-Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
-Route::post('/auth/verify-reset-token', [AuthController::class, 'verifyResetToken']);
+// Public auth endpoints are rate-limited per IP to slow down credential stuffing
+Route::middleware('throttle:6,1')->group(function () {
+    Route::post('/auth/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
+});
+Route::middleware('throttle:5,1')->group(function () {
+    Route::post('/auth/register', [AuthController::class, 'register']);
+    Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
+    Route::post('/auth/verify-reset-token', [AuthController::class, 'verifyResetToken']);
+});
 
 Route::get('/subscription/tiers', [SubscriptionController::class, 'tiers']);
 Route::get('/subscription/tiers/{tier}', [SubscriptionController::class, 'showTier']);
 
-Route::get('/ai/status', [AIController::class, 'status']);
+Route::get('/ai/status', [AIController::class, 'status'])->middleware('auth:sanctum');
 Route::post('/ai/chat', [AIController::class, 'chat'])->middleware('auth:sanctum');
 
 Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -161,14 +167,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel']);
     Route::post('/subscription/process-payment', [SubscriptionController::class, 'processPayment']);
     Route::post('/subscription/bank-transfer', [SubscriptionController::class, 'bankTransfer']);
-Route::post('/subscription/admin/set-tier/{user}/{tier}', [SubscriptionController::class, 'adminSetTier'])->middleware('auth:sanctum', 'role:admin');
-Route::get('/subscription/admin/subscriptions', [SubscriptionController::class, 'adminListSubscriptions'])->middleware('auth:sanctum', 'role:admin');
-Route::get('/subscription/admin/pending-payments', [SubscriptionController::class, 'adminListPendingPayments'])->middleware('auth:sanctum', 'role:admin');
-Route::post('/subscription/admin/approve-payment/{subscription}', [SubscriptionController::class, 'adminApprovePayment'])->middleware('auth:sanctum', 'role:admin');
-Route::post('/subscription/admin/reject-payment/{subscription}', [SubscriptionController::class, 'adminRejectPayment'])->middleware('auth:sanctum', 'role:admin');
-Route::post('/subscription/admin/tiers', [SubscriptionController::class, 'createTier'])->middleware('auth:sanctum', 'role:admin');
-Route::put('/subscription/admin/tiers/{tier}', [SubscriptionController::class, 'updateTier'])->middleware('auth:sanctum', 'role:admin');
-Route::delete('/subscription/admin/tiers/{tier}', [SubscriptionController::class, 'deleteTier'])->middleware('auth:sanctum', 'role:admin');
+Route::post('/subscription/admin/set-tier/{user}/{tier}', [SubscriptionController::class, 'adminSetTier'])->middleware('auth:sanctum', 'role:Admin');
+Route::get('/subscription/admin/subscriptions', [SubscriptionController::class, 'adminListSubscriptions'])->middleware('auth:sanctum', 'role:Admin');
+Route::get('/subscription/admin/pending-payments', [SubscriptionController::class, 'adminListPendingPayments'])->middleware('auth:sanctum', 'role:Admin');
+Route::post('/subscription/admin/approve-payment/{subscription}', [SubscriptionController::class, 'adminApprovePayment'])->middleware('auth:sanctum', 'role:Admin');
+Route::post('/subscription/admin/reject-payment/{subscription}', [SubscriptionController::class, 'adminRejectPayment'])->middleware('auth:sanctum', 'role:Admin');
+Route::post('/subscription/admin/tiers', [SubscriptionController::class, 'createTier'])->middleware('auth:sanctum', 'role:Admin');
+Route::put('/subscription/admin/tiers/{tier}', [SubscriptionController::class, 'updateTier'])->middleware('auth:sanctum', 'role:Admin');
+Route::delete('/subscription/admin/tiers/{tier}', [SubscriptionController::class, 'deleteTier'])->middleware('auth:sanctum', 'role:Admin');
 
     Route::get('/tasks', [TaskController::class, 'index']);
     Route::get('/tasks/my', [TaskController::class, 'myTasks']);
@@ -194,7 +200,7 @@ Route::delete('/subscription/admin/tiers/{tier}', [SubscriptionController::class
     Route::put('/predefined-tasks/{predefinedTask}', [PredefinedTaskController::class, 'update']);
     Route::delete('/predefined-tasks/{predefinedTask}', [PredefinedTaskController::class, 'destroy']);
 
-    Route::middleware('role:admin')->group(function () {
+    Route::middleware('role:Admin')->group(function () {
         Route::get('/admin/settings/general', [AdminSettingsController::class, 'getGeneralSettings']);
         Route::post('/admin/settings/general', [AdminSettingsController::class, 'saveGeneralSettings']);
         Route::get('/admin/settings/smtp', [AdminSettingsController::class, 'getSmtpSettings']);
@@ -228,21 +234,23 @@ Route::delete('/subscription/admin/tiers/{tier}', [SubscriptionController::class
         Route::delete('/admin/roles/{role}', [RoleManagementController::class, 'deleteRole']);
         Route::get('/admin/users/{user}/roles', [RoleManagementController::class, 'getUserRoles']);
         Route::put('/admin/users/{user}/roles', [RoleManagementController::class, 'updateUserRoles']);
-    });
 
+        // Platform-wide exports (every owner's data) and the species catalogue are admin-only
         Route::get('/export/animals', [ExportController::class, 'exportAnimals']);
         Route::get('/export/devices', [ExportController::class, 'exportDevices']);
         Route::get('/export/geofences', [ExportController::class, 'exportGeofences']);
         Route::get('/export/users', [ExportController::class, 'exportUsers']);
         Route::get('/export/database', [ExportController::class, 'exportDatabase']);
 
+        Route::post('/species', [SpeciesController::class, 'store']);
+        Route::put('/species/{species}', [SpeciesController::class, 'update']);
+        Route::delete('/species/{species}', [SpeciesController::class, 'destroy']);
+        Route::post('/species/{species}/breeds', [SpeciesController::class, 'storeBreed']);
+        Route::put('/breeds/{breed}', [SpeciesController::class, 'updateBreed']);
+        Route::delete('/breeds/{breed}', [SpeciesController::class, 'destroyBreed']);
+    });
+
     Route::get('/species', [SpeciesController::class, 'index']);
-    Route::post('/species', [SpeciesController::class, 'store']);
-    Route::put('/species/{species}', [SpeciesController::class, 'update']);
-    Route::delete('/species/{species}', [SpeciesController::class, 'destroy']);
-    Route::post('/species/{species}/breeds', [SpeciesController::class, 'storeBreed']);
-    Route::put('/breeds/{breed}', [SpeciesController::class, 'updateBreed']);
-    Route::delete('/breeds/{breed}', [SpeciesController::class, 'destroyBreed']);
 
 }); // end auth:sanctum group
 
@@ -253,5 +261,6 @@ Route::get('/translations-all', [LanguageController::class, 'translations']);
 Route::get('/translations/{group}', [LanguageController::class, 'getTranslationsByGroup']);
 Route::get('/languages/{code}', [LanguageController::class, 'show']);
 
-// GPS device ingestion — intentionally public (device auth handled at app level)
-Route::post('/location-history', [LocationHistoryController::class, 'store']);
+// GPS tracker ingestion — authenticated per device via the X-Device-Token header
+Route::post('/location-history', [LocationHistoryController::class, 'store'])
+    ->middleware([AuthenticateDevice::class, 'throttle:120,1']);

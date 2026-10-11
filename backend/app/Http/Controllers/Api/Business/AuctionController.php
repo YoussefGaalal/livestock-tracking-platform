@@ -267,7 +267,7 @@ class AuctionController extends Controller
         ]);
 
         try {
-            \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+            \Stripe\Stripe::setApiKey(\App\Services\PaymentGateway::stripeSecret());
 
             $charge = \Stripe\Charge::create([
                 'amount' => (int)($auction->current_price * 100),

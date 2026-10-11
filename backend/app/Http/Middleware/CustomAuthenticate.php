@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Laravel\Sanctum\PersonalAccessToken;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class CustomAuthenticate
 {
@@ -36,6 +37,15 @@ class CustomAuthenticate
         $request->setUserResolver(function () use ($user) {
             return $user;
         });
+
+        // Also expose the token's user to the auth guard — Spatie's role/permission
+        // middleware reads Auth::guard()->user(), not the request resolver
+        Auth::setUser($user);
+
+        // Some controllers still read identity from the legacy X-User-Id / X-User-Role
+        // headers. Pin them to the token's user so a client can never supply its own.
+        $request->headers->set('X-User-Id', (string) $user->id);
+        $request->headers->set('X-User-Role', $user->getPrimaryRoleName());
         
         return $next($request);
     }

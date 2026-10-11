@@ -26,6 +26,27 @@ class Device extends Model
         'last_ping',
     ];
 
+    protected $hidden = [
+        'api_token',
+    ];
+
+    /**
+     * Issue a new ingestion token for this device. Only the hash is stored,
+     * so the returned plain-text token can't be recovered later.
+     */
+    public function issueApiToken(): string
+    {
+        $token = \Illuminate\Support\Str::random(48);
+        $this->forceFill(['api_token' => hash('sha256', $token)])->save();
+
+        return $token;
+    }
+
+    public static function findByApiToken(?string $token): ?self
+    {
+        return $token ? static::where('api_token', hash('sha256', $token))->first() : null;
+    }
+
     protected $casts = [
         'battery_level' => 'integer',
         'signal_strength' => 'integer',

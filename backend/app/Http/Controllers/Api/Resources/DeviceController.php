@@ -17,6 +17,10 @@ class DeviceController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        if (!$request->user()->hasPermissionTo('device_view')) {
+            return response()->json(['message' => 'Unauthorized', 'error' => 'unauthorized'], 403);
+        }
+
         $query = Device::query()->with('owner');
         $query = $this->filterByOwner($request, $query);
         
@@ -27,7 +31,7 @@ class DeviceController extends Controller
 
     public function show(Request $request, Device $device): JsonResponse
     {
-        if (!$this->canAccessOwner($request, $device->owner_id)) {
+        if (!$request->user()->hasPermissionTo('device_view') || !$this->canAccessOwner($request, $device->owner_id)) {
             return response()->json(['message' => 'Unauthorized', 'error' => 'unauthorized'], 403);
         }
         
