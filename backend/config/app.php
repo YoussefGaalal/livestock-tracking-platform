@@ -17,6 +17,4 @@ return [
             explode(',', env('APP_PREVIOUS_KEYS', ''))
         ),
     ],
-    'providers' => [],
-    'aliases' => [],
 ];

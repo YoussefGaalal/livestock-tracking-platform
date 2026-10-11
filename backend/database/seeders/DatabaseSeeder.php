@@ -6,24 +6,18 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
+    /**
+     * Seeds reference data plus the demo accounts and their livestock.
+     * Every seeder is idempotent, so this is also what runs on each deploy.
+     */
     public function run(): void
     {
         $this->call([
-            LanguageSeeder::class,
             SubscriptionTierSeeder::class,
-            UserSeeder::class,
-            UserSubscriptionSeeder::class,
             RoleSeeder::class,
-            UserRoleSeeder::class,
-            DeviceSeeder::class,
-            AnimalSeeder::class,
-            AnimalGroupSeeder::class,
-            GeofenceSeeder::class,
-            LocationHistorySeeder::class,
-            AuctionSeeder::class,
-            BidSeeder::class,
-            GeofenceAlertSeeder::class,
-            TaskSeeder::class,
+            UserSeeder::class,
+            LanguageSeeder::class,
+            DemoDataSeeder::class,
         ]);
     }
 }

@@ -34,6 +34,12 @@ class DemoDataSeeder extends Seeder
             return;
         }
 
+        // Demo data belongs to the demo accounts; without them (see UserSeeder) there is nothing to seed
+        if (!User::where('email', 'khalid@oasis.com')->exists()) {
+            echo "DemoDataSeeder: demo users not present — skipping.\n";
+            return;
+        }
+
         // Clean up any partial previous run before re-seeding
         \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         \App\Models\VaccinationSchedule::truncate();
@@ -455,9 +461,9 @@ class DemoDataSeeder extends Seeder
                 'start'    => 1800.00,
                 'reserve'  => 2500.00,
                 'current'  => 2100.00,
-                'status'   => 'completed',
+                'status'   => 'sold',
                 'starts_at'=> now()->subDays(10),
-                'ends_at'  => now()->subDays(3),
+                'ends_at'  => now()->subDays(1),
             ],
             [
                 'animal'   => $animals[11], // Jabir (cattle)
@@ -473,36 +479,56 @@ class DemoDataSeeder extends Seeder
             ],
         ];
 
+        $saeed = User::where('email', 'saeed@oasis.com')->first();
+        $owners = array_filter([$khalid, $ahmad, $saeed]);
+
         foreach ($auctionDefs as $ad) {
+            // Bidders are the other owners — sellers can't bid on their own auctions
+            $bidders = array_values(array_filter($owners, fn ($u) => $u->id !== $ad['seller']->id));
+            $sold = $ad['status'] === 'sold';
+
+            // Bids climb evenly from the starting price; the last one equals current_price
+            $bidCount = 4;
+            $bids = [];
+            for ($j = 1; $j <= $bidCount; $j++) {
+                $bids[] = [
+                    'user'   => $bidders[($j - 1) % count($bidders)],
+                    'amount' => $j === $bidCount
+                        ? $ad['current']
+                        : round(($ad['start'] + ($ad['current'] - $ad['start']) * $j / $bidCount) / 50) * 50,
+                    'at'     => $ad['starts_at']->copy()->addHours(6 * $j),
+                ];
+            }
+            $winner = end($bids)['user'];
+
             $auction = Auction::create([
-                'animal_id'      => $ad['animal']->id,
-                'owner_id'       => $ad['seller']->id,
-                'title'          => $ad['title'],
-                'description'    => $ad['desc'],
-                'starting_price' => $ad['start'],
-                'reserve_price'  => $ad['reserve'],
-                'current_price'  => $ad['current'],
-                'status'         => $ad['status'],
-                'starts_at'      => $ad['starts_at'],
-                'ends_at'        => $ad['ends_at'],
-                'ended_at'       => $ad['status'] === 'completed' ? $ad['ends_at'] : null,
-                'payment_status' => $ad['status'] === 'completed' ? 'paid' : null,
+                'animal_id'          => $ad['animal']->id,
+                'owner_id'           => $ad['seller']->id,
+                'title'              => $ad['title'],
+                'description'        => $ad['desc'],
+                'starting_price'     => $ad['start'],
+                'reserve_price'      => $ad['reserve'],
+                'current_price'      => $ad['current'],
+                'status'             => $ad['status'],
+                'starts_at'          => $ad['starts_at'],
+                'ends_at'            => $ad['ends_at'],
+                'ended_at'           => $sold ? $ad['ends_at'] : null,
+                'winner_id'          => $sold ? $winner->id : null,
+                'second_winner_id'   => $sold ? $bids[$bidCount - 2]['user']->id : null,
+                // Sold auction awaits the winner's payment proof, then admin verification
+                'payment_status'     => 'pending',
+                'payment_expires_at' => $sold ? now()->addDays(3) : null,
             ]);
 
-            // Add realistic bids to active auctions
-            if ($ad['status'] === 'active') {
-                $steps    = [500, 1000, 1500, $ad['current'] - $ad['start']];
-                $running  = $ad['start'];
-                $bidders  = [$ahmad->id, $khalid->id, $ahmad->id];
-                foreach (array_slice($steps, 0, 3) as $j => $step) {
-                    $running += $step;
-                    Bid::create([
-                        'auction_id' => $auction->id,
-                        'bidder_id'  => $bidders[$j % count($bidders)],
-                        'amount'     => $running,
-                        'status'     => 'active',
-                    ]);
-                }
+            foreach ($bids as $j => $b) {
+                Bid::create([
+                    'auction_id'  => $auction->id,
+                    'user_id'     => $b['user']->id,
+                    'amount'      => $b['amount'],
+                    'bidder_name' => $b['user']->name,
+                    'bid_at'      => $b['at'],
+                    'is_winning'  => $j === $bidCount - 1,
+                ]);
             }
         }
 

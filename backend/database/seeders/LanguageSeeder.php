@@ -16,10 +16,13 @@ class LanguageSeeder extends Seeder
             ['code' => 'eu', 'name' => 'Basque', 'native_name' => 'Euskara', 'direction' => 'ltr', 'is_active' => true, 'is_default' => false, 'sort_order' => 4],
         ];
 
-        DB::table('languages')->insert($languages);
+        // Upserts keep this safe to run on every deploy without clobbering admin edits to languages
+        DB::table('languages')->upsert($languages, ['code'], ['name', 'native_name', 'direction', 'sort_order']);
 
         $translations = $this->getTranslations();
-        DB::table('translations')->insert($translations);
+        foreach (array_chunk($translations, 500) as $chunk) {
+            DB::table('translations')->insertOrIgnore($chunk);
+        }
     }
 
     private function getTranslations(): array
@@ -27,12 +30,6 @@ class LanguageSeeder extends Seeder
         $translations = [];
         
         $groups = [
-'common' => [
-                'appName' => ['en' => 'The Oasis', 'ar' => 'الواحة', 'ur' => 'اویسس', 'eu' => 'Oasia'],
-                'quickActions' => ['en' => 'Quick Actions', 'ar' => 'إجراءات سريعة', 'ur' => 'کوئیک ایکشن', 'eu' => 'Ekintza azkarrak'],
-                'success' => ['en' => 'Success', 'ar' => 'نجاح', 'ur' => 'کامیاب', 'eu' => 'Arrakasta'],
-                'error' => ['en' => 'Error', 'ar' => 'خطأ', 'ur' => 'خرابی', 'eu' => 'Errorea'],
-            ],
             'dashboard' => [
                 'title' => ['en' => 'Dashboard', 'ar' => 'لوحة التحكم', 'ur' => 'ڈیش بورڈ', 'eu' => 'Azpiegitura'],
                 'totalAnimals' => ['en' => 'Total Animals', 'ar' => 'إجمالي الحيوانات', 'ur' => 'کل جانور', 'eu' => 'Animalia kopurua'],
@@ -203,6 +200,10 @@ class LanguageSeeder extends Seeder
                 'selectPlan' => ['en' => 'Select Plan', 'ar' => 'اختر الخطة', 'ur' => 'پلان انتخاب کریں', 'eu' => 'Plan bat aukeratu'],
             ],
             'common' => [
+                'appName' => ['en' => 'The Oasis', 'ar' => 'الواحة', 'ur' => 'اویسس', 'eu' => 'Oasia'],
+                'quickActions' => ['en' => 'Quick Actions', 'ar' => 'إجراءات سريعة', 'ur' => 'کوئیک ایکشن', 'eu' => 'Ekintza azkarrak'],
+                'success' => ['en' => 'Success', 'ar' => 'نجاح', 'ur' => 'کامیاب', 'eu' => 'Arrakasta'],
+                'error' => ['en' => 'Error', 'ar' => 'خطأ', 'ur' => 'خرابی', 'eu' => 'Errorea'],
                 'add' => ['en' => 'Add', 'ar' => 'إضافة', 'ur' => 'شامل کریں', 'eu' => 'Gehitu'],
                 'edit' => ['en' => 'Edit', 'ar' => 'تعديل', 'ur' => 'ترمیم', 'eu' => 'Editatu'],
                 'delete' => ['en' => 'Delete', 'ar' => 'حذف', 'ur' => 'حذف کریں', 'eu' => 'Ezabatu'],
@@ -233,7 +234,7 @@ class LanguageSeeder extends Seeder
                 'common.loading' => ['en' => 'Loading...', 'ar' => 'جاري التحميل...', 'ur' => 'لوڈ ہو رہا ہے...', 'eu' => 'Kargatzen...'],
                 'common.code' => ['en' => 'Code', 'ar' => 'الرمز', 'ur' => 'کوڈ', 'eu' => 'Kodea'],
                 'common.name' => ['en' => 'Name', 'ar' => 'الاسم', 'ur' => 'نام', 'eu' => 'Izena'],
-                'common.nativeName' => ['en' => 'Native Name', 'ar' => 'الاسم الأصلي', 'ur' => '本 ��� نام', 'eu' => 'Jatorrizko izena'],
+                'common.nativeName' => ['en' => 'Native Name', 'ar' => 'الاسم الأصلي', 'ur' => 'اصل نام', 'eu' => 'Jatorrizko izena'],
                 'common.direction' => ['en' => 'Direction', 'ar' => 'الاتجاه', 'ur' => 'سمت', 'eu' => 'Norabidea'],
                 'common.status' => ['en' => 'Status', 'ar' => 'الحالة', 'ur' => 'حالت', 'eu' => 'Egoera'],
             ],
