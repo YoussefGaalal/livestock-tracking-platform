@@ -1,76 +1,32 @@
-# ============================================================
-# Root .gitignore — animal-trading-v2 (The Oasis)
-# ============================================================
-
 # ----- Laravel / PHP ----------------------------------------
 backend/vendor/
 backend/node_modules/
-backend/.env
-backend/.env.local
-backend/.env.*.local
-backend/storage/logs/*.log
-backend/storage/framework/cache/
-backend/storage/framework/sessions/
-backend/storage/framework/views/
-backend/bootstrap/cache/*.php
+# storage/ and bootstrap/cache/ carry their own .gitignore placeholders (Laravel default)
 backend/public/hot
 backend/public/storage
 
-# Compiled React frontend output — commit it so Railway always has a working build.
-# (Railway also rebuilds on deploy, but this is a reliable fallback.)
-# backend/public/app/    ← intentionally NOT ignored
+# Compiled frontend — built by `npm run build` locally and on deploy
+backend/public/app/
+backend/public/build/
 
-# ----- Flutter / Dart ---------------------------------------
-mobile/.dart_tool/
-mobile/.flutter-plugins
-mobile/.flutter-plugins-dependencies
-mobile/build/
-mobile/.packages
-# pubspec.lock is intentionally committed for reproducible Flutter builds
-
-# ----- Node (root-level tooling) ----------------------------
+# ----- Node -------------------------------------------------
 node_modules/
 
-# ----- Environment & Secrets --------------------------------
+# ----- Environment & secrets --------------------------------
 .env
 .env.*
-!.env.production        # keep the production template (no real secrets)
+!.env.example
 *.pem
 *.key
 *.p12
 *.pfx
 
-*-analysis-report.html
-*-analysis-report.json
-Backend_Deep_Analysis.html
-# NOTE: Do NOT use *.html here — it would block backend/public/app/index.html
-# Instead list specific files:
-/Backend_Deep_Analysis.html
+# ----- Test & tooling output --------------------------------
+backend/.phpunit.result.cache
+backend/.phpunit.cache/
+backend/coverage/
 
-
-# ----- Word temp files --------------------------------------
-~$*.docx
-~$*.xlsx
-~$*.pptx
-
-# ----- Local generation/helper scripts (not part of the project) -----------
-generate-report.js
-generate-report.bat
-/package.json
-/package-lock.json
-
-# ----- Root-level docs (internal only) ----------------------
-DEPLOYMENT_GUIDE.md
-Pre-Deployment-Security-Review.docx
-*.docx
-
-# ----- Stray root-level Laravel file ------------------------
-/artisan
-
-# ----- Nested duplicate folder -----------------------------
-backend/backend/
-
-# ----- OS & Editor ------------------------------------------
+# ----- OS & editor ------------------------------------------
 .DS_Store
 Thumbs.db
 desktop.ini
