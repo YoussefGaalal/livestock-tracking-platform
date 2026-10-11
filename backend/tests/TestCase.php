@@ -14,10 +14,8 @@ abstract class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
-        // Use MySQL for testing (matches production)
-        config(['database.default' => 'mysql']);
-        
+
+        // Tests run on MySQL (matches production) — connection is set in phpunit.xml
         $this->seedDatabase();
     }
 
@@ -29,27 +27,8 @@ abstract class TestCase extends BaseTestCase
 
     protected function seedPermissions(): void
     {
-        $roles = ['Admin', 'Owner', 'Veterinarian', 'Shepherd', 'Manager'];
-        foreach ($roles as $role) {
-            \Spatie\Permission\Models\Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
-        }
-
-        $permissions = [
-            'manage_animals',
-            'manage_devices',
-            'manage_users',
-            'manage_geofences',
-            'manage_auctions',
-            'manage_medical_records',
-            'manage_tasks',
-            'manage_vaccinations',
-            'view_reports',
-            'export_data',
-        ];
-
-        foreach ($permissions as $permission) {
-            \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
-        }
+        // Use the production roles/permissions matrix so tests exercise real access rules
+        $this->seed(\Database\Seeders\RoleSeeder::class);
     }
 
     protected function seedSubscriptionTiers(): void
@@ -90,7 +69,8 @@ abstract class TestCase extends BaseTestCase
 
     protected function createUser(array $overrides = []): \App\Models\User
     {
-        $tierId = $overrides['subscription_tier_id'] ?? 2;
+        // Look the tier up by slug — MySQL auto-increment IDs keep growing across test transactions
+        $tierId = $overrides['subscription_tier_id'] ?? \App\Models\SubscriptionTier::where('slug', 'basic')->value('id');
         
         $user = \App\Models\User::create([
             'name' => $overrides['name'] ?? 'Test User',
@@ -148,6 +128,17 @@ abstract class TestCase extends BaseTestCase
             'is_active' => $overrides['is_active'] ?? true,
             'owner_id' => $overrides['owner_id'] ?? $this->user->id ?? $this->createUser()->id,
         ]);
+    }
+
+    /**
+     * The API's auth middleware only accepts bearer tokens, so sign test
+     * requests with a real Sanctum token as well as the session guard.
+     */
+    public function actingAs(\Illuminate\Contracts\Auth\Authenticatable $user, $guard = null)
+    {
+        parent::actingAs($user, $guard);
+
+        return $this->withToken($user->createToken('test')->plainTextToken);
     }
 
     protected function authAs(\App\Models\User $user): void

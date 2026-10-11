@@ -13,10 +13,6 @@ class DeviceCrudTest extends TestCase
     {
         parent::setUp();
         $this->user = $this->createUser(['email' => 'owner@example.com']);
-        $this->user->givePermissionTo([
-            'manage_animals', 'manage_devices', 'manage_users', 
-            'manage_geofences'
-        ]);
         $this->authAs($this->user);
     }
 

@@ -8,7 +8,19 @@ class RegisterTest extends TestCase
 {
     public function test_user_can_register_with_valid_data(): void
     {
-        $this->markTestSkipped('Skipped due to infinite recursion in exception handler - needs investigation');
+        $response = $this->postJson('/api/auth/register', [
+            'name' => 'New Owner',
+            'email' => 'new.owner@example.com',
+            'phone' => '+1234567890',
+            'password' => 'securePassword123',
+            'password_confirmation' => 'securePassword123',
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('user.email', 'new.owner@example.com');
+
+        $user = \App\Models\User::where('email', 'new.owner@example.com')->firstOrFail();
+        $this->assertTrue($user->hasRole('Owner'));
     }
 
     public function test_registration_requires_all_fields(): void

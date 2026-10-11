@@ -12,7 +12,6 @@ class VaccinationScheduleCrudTest extends TestCase
     {
         parent::setUp();
         $this->user = $this->createUser(['email' => 'owner@example.com']);
-        $this->user->givePermissionTo(['manage_animals', 'manage_vaccinations']);
         $this->authAs($this->user);
     }
 

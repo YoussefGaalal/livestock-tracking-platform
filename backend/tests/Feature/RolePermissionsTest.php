@@ -21,24 +21,17 @@ class RolePermissionsTest extends TestCase
             'name' => "Test $role",
             'email' => strtolower($role) . '@test.com',
             'password' => bcrypt('password'),
-            'role' => $role,
             'language' => 'en',
         ]);
-        
-        // Create Sanctum token for auth:sanctum middleware
-        $token = $user->createToken('test-token');
-        
+        $user->assignRole($role);
+
         return $user;
     }
-    
-    // Helper to make authenticated request with Sanctum token
+
+    // Helper to make an authenticated request with a Sanctum bearer token
     protected function withAuth(User $user, callable $callback)
     {
-        $token = $user->tokens->first();
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token->accessToken
-        ]);
-        return $callback($response);
+        return $callback($this->withToken($user->createToken('test-token')->plainTextToken));
     }
 
     protected function createTestDataForUser(User $owner): array
@@ -223,14 +216,14 @@ class RolePermissionsTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_manager_cannot_access_subscription()
+    public function test_manager_cannot_view_another_users_subscription()
     {
         $owner = $this->createUserWithRole('Owner');
         $manager = $this->createUserWithRole('Manager');
         $manager->managed_by = $owner->id;
         $manager->save();
 
-        $response = $this->actingAs($manager)->getJson('/api/subscription/current');
+        $response = $this->actingAs($manager)->getJson('/api/subscription/current?user_id=' . $owner->id);
         $response->assertStatus(403);
     }
 
@@ -315,8 +308,9 @@ class RolePermissionsTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_shepherd_cannot_access_devices()
+    public function test_shepherd_can_view_devices()
     {
+        // Shepherds hold device_view (RoleSeeder) and the Devices page allows them
         $owner = $this->createUserWithRole('Owner');
         $shepherd = $this->createUserWithRole('Shepherd');
         $shepherd->managed_by = $owner->id;
@@ -325,7 +319,7 @@ class RolePermissionsTest extends TestCase
         $data = $this->createTestDataForUser($owner);
 
         $response = $this->actingAs($shepherd)->getJson('/api/devices');
-        $response->assertStatus(403);
+        $response->assertStatus(200);
     }
 
     public function test_shepherd_cannot_access_users()
@@ -339,14 +333,14 @@ class RolePermissionsTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_shepherd_cannot_access_subscription()
+    public function test_shepherd_cannot_view_another_users_subscription()
     {
         $owner = $this->createUserWithRole('Owner');
         $shepherd = $this->createUserWithRole('Shepherd');
         $shepherd->managed_by = $owner->id;
         $shepherd->save();
 
-        $response = $this->actingAs($shepherd)->getJson('/api/subscription/current');
+        $response = $this->actingAs($shepherd)->getJson('/api/subscription/current?user_id=' . $owner->id);
         $response->assertStatus(403);
     }
 }

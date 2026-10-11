@@ -16,10 +16,6 @@ class AuctionCrudTest extends TestCase
         parent::setUp();
         $this->owner = $this->createUser(['email' => 'owner@test.com', 'subscription_tier_id' => 3]);
         $this->otherUser = $this->createUser(['email' => 'other@test.com', 'subscription_tier_id' => 3]);
-        $this->owner->givePermissionTo([
-            'manage_animals', 'manage_auctions', 'manage_devices', 
-            'manage_geofences', 'view_reports', 'export_data'
-        ]);
         $this->withoutMiddleware(\App\Http\Middleware\CheckSubscriptionLimits::class);
         $this->authAs($this->owner);
     }

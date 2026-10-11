@@ -15,7 +15,6 @@ class GeofenceCrudTest extends TestCase
         parent::setUp();
         $this->user = $this->createUser();
         $this->otherUser = $this->createUser(['email' => 'other@example.com']);
-        $this->user->givePermissionTo(['manage_animals', 'manage_geofences', 'manage_devices']);
         $this->withoutMiddleware(\App\Http\Middleware\CheckSubscriptionLimits::class);
         $this->authAs($this->user);
     }

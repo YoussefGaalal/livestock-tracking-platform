@@ -12,7 +12,6 @@ class TaskLogCrudTest extends TestCase
     {
         parent::setUp();
         $this->user = $this->createUser(['email' => 'owner@example.com']);
-        $this->user->givePermissionTo(['manage_tasks']);
         $this->authAs($this->user);
     }
 

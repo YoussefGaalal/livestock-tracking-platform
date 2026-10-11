@@ -12,7 +12,6 @@ class SubscriptionTest extends TestCase
     {
         parent::setUp();
         $this->user = $this->createUser(['email' => 'owner@example.com']);
-        $this->user->givePermissionTo(['manage_animals', 'manage_devices']);
         $this->authAs($this->user);
     }
 
@@ -25,6 +24,10 @@ class SubscriptionTest extends TestCase
 
     public function test_can_get_current_subscription(): void
     {
-        $this->markTestSkipped('Skipped - route not found');
+        $response = $this->getJson('/api/subscription/current');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('tier.slug', 'basic')
+            ->assertJsonStructure(['limits' => ['animals' => ['used', 'max'], 'devices', 'users']]);
     }
 }
