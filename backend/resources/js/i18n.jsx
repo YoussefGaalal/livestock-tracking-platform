@@ -2,6 +2,10 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { useTranslation, I18nextProvider } from 'react-i18next';
 import { useEffect } from 'react';
+import en from './i18n/en';
+import ar from './i18n/ar';
+import ur from './i18n/ur';
+import eu from './i18n/eu';
 
 const resources = {
   en: {
@@ -120,7 +124,7 @@ const resources = {
       // Platform
       platform: {
         name: 'Oasis Trace',
-        copyright: '© 2024 {name}. Digital Majlis.',
+        copyright: '© {year} {name}. Digital Majlis.',
       },
       // Dashboard
       dashboard: {
@@ -577,7 +581,7 @@ const resources = {
       // Platform
       platform: {
         name: 'أواسيس تريس',
-        copyright: '© 2024 {name}. ديچيتال مجلس.',
+        copyright: '© {year} {name}. ديجيتال مجلس.',
       },
       // Dashboard
       dashboard: {
@@ -921,11 +925,39 @@ const resources = {
   },
 };
 
+// The full dictionaries live in ./i18n/{en,ar,ur,eu}.js; the inline strings above
+// take precedence where both define a key, so existing copy is unchanged.
+const deepMerge = (base, override) => {
+  const out = { ...base };
+  for (const [key, value] of Object.entries(override || {})) {
+    out[key] = value && typeof value === 'object' && !Array.isArray(value)
+      ? deepMerge(base?.[key] || {}, value)
+      : value;
+  }
+  return out;
+};
+
+const dictionaries = { en, ar, ur, eu };
+const mergedResources = Object.fromEntries(
+  Object.entries(dictionaries).map(([lng, dict]) => [
+    lng,
+    { translation: deepMerge(dict, resources[lng]?.translation) },
+  ])
+);
+
+export const isRtl = (lng) => ['ar', 'ur'].includes(lng);
+
+const applyDocumentDirection = (lng) => {
+  document.documentElement.dir = isRtl(lng) ? 'rtl' : 'ltr';
+  document.documentElement.lang = lng;
+};
+
 i18n.use(initReactI18next).init({
-  resources,
+  resources: mergedResources,
   lng: localStorage.getItem('i18nextLng') || 'en',
   fallbackLng: 'en',
-  interpolation: { escapeValue: false },
+  // Dictionaries use single-brace placeholders: 'Showing {count} devices'
+  interpolation: { escapeValue: false, prefix: '{', suffix: '}' },
 });
 
 // Sync locale with backend on init
@@ -952,33 +984,34 @@ if (typeof window !== 'undefined') {
 
 export function useI18n() {
   const { t, i18n: i18nInstance } = useTranslation();
+  const changeLanguage = (lng) => {
+    i18nInstance.changeLanguage(lng);
+    localStorage.setItem('i18nextLng', lng);
+    applyDocumentDirection(lng);
+    // Sync with backend
+    const token = localStorage.getItem('oasis_token');
+    if (token) {
+      fetch('/api/auth/locale', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ locale: lng })
+      }).catch(() => {});
+    }
+  };
+
   return {
     t,
-    dir: i18nInstance.dir(),
+    dir: isRtl(i18nInstance.language) ? 'rtl' : 'ltr',
     language: i18nInstance.language,
-    changeLanguage: (lng) => {
-      i18nInstance.changeLanguage(lng);
-      localStorage.setItem('i18nextLng', lng);
-      document.documentElement.dir = lng === 'ar' ? 'rtl' : 'ltr';
-      document.documentElement.lang = lng;
-      // Sync with backend
-      const token = localStorage.getItem('oasis_token');
-      if (token) {
-        fetch('/api/auth/locale', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({ locale: lng })
-        }).catch(() => {});
-      }
-    },
+    locale: i18nInstance.language,
+    changeLanguage,
+    setLocale: changeLanguage,
   };
 }
 
 export function I18nProvider({ children }) {
   useEffect(() => {
-    const lng = i18n.language;
-    document.documentElement.dir = lng === 'ar' ? 'rtl' : 'ltr';
-    document.documentElement.lang = lng;
+    applyDocumentDirection(i18n.language);
   }, []);
   return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
 }

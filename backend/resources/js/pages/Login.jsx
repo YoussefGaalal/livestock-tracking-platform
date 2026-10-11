@@ -64,7 +64,7 @@ export default function Login() {
           const data = await response.json();
           setError(data.message || data.errors?.email?.[0] || t('errors.serverError'));
         }
-      } catch (err) {
+      } catch {
         setError(t('errors.networkError'));
       }
     }
@@ -308,7 +308,7 @@ export default function Login() {
        <footer className={`py-6 px-12 z-20 bg-[#06402B] ${isRtl ? 'flex-row-reverse' : ''}`}>
          <div className={`flex justify-center items-center max-w-screen-2xl mx-auto ${isRtl ? 'flex-row-reverse' : ''}`}>
             <p className="text-white/80 font-medium text-sm">
-              {t('platform.copyright', { name: platformName })}
+              {t('platform.copyright', { name: platformName, year: new Date().getFullYear() })}
             </p>
          </div>
        </footer>

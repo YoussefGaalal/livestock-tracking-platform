@@ -1,5 +1,4 @@
-import { MaterialSymbol } from 'react-material-symbols';
-import { useI18n } from './index';
+import { useI18n } from '../i18n.jsx';
 
 const defaultLanguages = [
   { code: 'en', name: 'English', native_name: 'English', direction: 'ltr' },

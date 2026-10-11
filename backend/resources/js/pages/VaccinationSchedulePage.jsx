@@ -101,7 +101,7 @@ export default function VaccinationSchedulePage() {
         const data = await res.json();
         setMessage({ type: 'error', text: data.message || t('vaccination.saveFailed') });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: t('vaccination.networkError') });
     }
   };
@@ -152,10 +152,10 @@ export default function VaccinationSchedulePage() {
     try {
       const res = await apiFetch(`/api/vaccination-schedules/${id}/administer`, { method: 'POST' });
       if (res.ok) {
-        setMessage({ type: 'success', text: t('vaccination.administered') });
+        setMessage({ type: 'success', text: t('vaccination.administeredSuccess') });
         fetchData();
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: t('vaccination.networkError') });
     }
   };
@@ -168,7 +168,7 @@ export default function VaccinationSchedulePage() {
         setMessage({ type: 'success', text: t('vaccination.cancelled') });
         fetchData();
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: t('vaccination.cancelFailed') });
     }
   };
@@ -181,7 +181,7 @@ export default function VaccinationSchedulePage() {
         setMessage({ type: 'success', text: t('vaccination.deleted') });
         fetchData();
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: t('vaccination.deleteFailed') });
     }
   };

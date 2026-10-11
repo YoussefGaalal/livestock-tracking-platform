@@ -170,10 +170,10 @@ export default function MedicalRecordsPage() {
     try {
       const res = await apiFetch(`/api/vaccination-schedules/${id}/administer`, { method: 'POST' });
       if (res.ok) {
-        setMessage({ type: 'success', text: t('vaccination.administered') });
+        setMessage({ type: 'success', text: t('vaccination.administeredSuccess') });
         fetchData();
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: t('vaccination.networkError') });
     }
   };
@@ -221,7 +221,7 @@ export default function MedicalRecordsPage() {
         const data = await res.json();
         setMessage({ type: 'error', text: data.message || 'Failed to save record' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Network error' });
     }
   };
@@ -278,7 +278,7 @@ export default function MedicalRecordsPage() {
         fetchData();
         fetchRecords();
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to delete' });
     }
   };
