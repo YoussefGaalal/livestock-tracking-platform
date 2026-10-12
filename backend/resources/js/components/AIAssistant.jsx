@@ -4,9 +4,8 @@ import { useI18n } from '../i18n';
 import { useAuth } from '../context/AuthContext';
 
 const GEMINI_MODELS = [
-  { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', description: 'Fast & capable', context: '1M tokens' },
-  { id: 'gemini-2.0-flash-001', name: 'Gemini 2.0 Flash 001', description: 'Stable fast model', context: '1M tokens' },
-  { id: 'gemini-2.0-flash-lite-001', name: 'Gemini 2.0 Flash Lite', description: 'Lightweight & fast', context: '1M tokens' },
+  { id: 'gemini-3.8-flash', name: 'Gemini 3.8 Flash', description: 'Fast & capable', context: '1M tokens' },
+  { id: 'gemini-flash-latest', name: 'Gemini Flash (latest)', description: 'Always the newest Flash model', context: '1M tokens' },
 ];
 
 const API_KEY_STORAGE = 'gemini_api_key';

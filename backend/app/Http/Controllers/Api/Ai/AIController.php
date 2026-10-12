@@ -17,7 +17,7 @@ class AIController extends Controller
         ]);
 
         $message = $request->input('message');
-        $model = $request->input('model', 'gemini-2.0-flash');
+        $model = $request->input('model', 'gemini-3.8-flash');
 
         $settings = DB::table('settings')->where('key', 'like', 'gemini_%')->pluck('value', 'key')->toArray();
         $apiKey = $settings['gemini_api_key'] ?? null;
