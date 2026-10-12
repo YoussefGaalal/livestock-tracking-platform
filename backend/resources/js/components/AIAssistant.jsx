@@ -231,12 +231,17 @@ CURRENT USER CONTEXT:
 
       const data = await response.json();
       const finishReason = data.candidates?.[0]?.finishReason;
-      const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 
-                        finishReason === 'MAX_TOKENS' 
-                          ? (language === 'ar' ? 'تم الوصول للحد الأقصى من الرد.' : 'Response was truncated.')
-                          : finishReason === 'SAFETY'
-                          ? (language === 'ar' ? 'تم حظر هذا الرد بسبب مخاوف أمنية.' : 'This response was blocked for safety reasons.')
-                          : (language === 'ar' ? 'لم يتم العثور على رد.' : 'No response generated.');
+      // Newer models can split the answer across several parts (and include thought parts)
+      const parts = data.candidates?.[0]?.content?.parts || [];
+      const text = parts.filter(p => p.text && !p.thought).map(p => p.text).join('').trim();
+      // Parenthesised: without them `text || reason === X ? a : b` replaced every answer with the fallback
+      const aiResponse = text || (
+        finishReason === 'MAX_TOKENS'
+          ? (language === 'ar' ? 'تم الوصول للحد الأقصى من الرد.' : 'Response was truncated.')
+          : finishReason === 'SAFETY'
+          ? (language === 'ar' ? 'تم حظر هذا الرد بسبب مخاوف أمنية.' : 'This response was blocked for safety reasons.')
+          : (language === 'ar' ? 'لم يتم العثور على رد.' : 'No response generated.')
+      );
 
       setMessages(prev => [...prev, { role: 'assistant', content: aiResponse }]);
     } catch (error) {
