@@ -68,15 +68,21 @@ export default function AIAssistant() {
         fetch('/api/geofences', { headers }).catch(() => null),
       ]);
 
-      const [animals, alerts, geofences] = await Promise.all([
+      const [animalsBody, alertsBody, geofencesBody] = await Promise.all([
         animalsRes?.ok ? animalsRes.json() : Promise.resolve([]),
         alertsRes?.ok ? alertsRes.json() : Promise.resolve([]),
         geofencesRes?.ok ? geofencesRes.json() : Promise.resolve([]),
       ]);
 
-      const activeAlerts = alerts.filter(a => !a.is_acknowledged)?.length || 0;
-      const totalAnimals = Array.isArray(animals) ? animals.length : 0;
-      const totalGeofences = Array.isArray(geofences) ? geofences.length : 0;
+      // API lists come wrapped as { data: [...], meta: { total } }
+      const asList = (body) => (Array.isArray(body) ? body : Array.isArray(body?.data) ? body.data : []);
+      const animals = asList(animalsBody);
+      const alerts = asList(alertsBody);
+      const geofences = asList(geofencesBody);
+
+      const activeAlerts = alerts.filter(a => !a.is_acknowledged).length;
+      const totalAnimals = animalsBody?.meta?.total ?? animalsBody?.total ?? animals.length;
+      const totalGeofences = geofences.length;
 
       setUserContext({
         userName: user?.name || 'User',
